@@ -13,7 +13,7 @@ arcpy.env.overwriteOutput = True
 # Check out the ArcGIS Spatial Analyst extension license
 arcpy.CheckOutExtension("Spatial")
 
-#%%
+
 
 try:
 
@@ -24,7 +24,7 @@ try:
     
 #    #INPUT ARGUMENTS FOR PYTHON DIRECTLY
 #    SHP_FLDR = "C:\Users\mnk5\Documents\GIS\DATA\Datasets_trimmed	"	 # Folder containing shapefiles trimmed
-#    HUC12 = "C:\Users\mnk5\Documents\GIS\DATA\Datasets_trimmed\ForProcessing\HUC12_CO.shp"			 # HUC-12 shapefile
+#    HUC12 = "C:\Users\mnk5\Documents\GIS\DATA\Datasets_trimmed\ForProcessing\
     
     #OUTPUTFOLDER
     Out_path= SHP_FLDR +"\\RESULTS" 
@@ -42,14 +42,25 @@ try:
     arcpy.env.workspace = SHP_FLDR
     FILES = arcpy.ListFeatureClasses()
     
+    arcpy.AddMessage('COUNTING FEATURES BY HUC-12')
+    arcpy.AddMessage(' ')
+    
     for fc in FILES:
+        
+        filename  = os.path.splitext(fc)[0]
+        arcpy.AddMessage(filename)
+        
+        # Trim to only floodplain extents and divide by HUC-12
         inFeatures = [fc, FP]
-        arcpy.Intersect_analysis(inFeatures, "OutTrim")
+        arcpy.Intersect_analysis(inFeatures, Out_path + "\\OutTrim.shp")
         desc = arcpy.Describe(fc)
         
+        # Location to save files
+        OutTrim = Out_path + "\\OutTrim.shp"
+        OutTable = Out_path + "\\" + filename + "_table.csv"
         if desc.shapeType == "Point":
 #        # add column of count per huc 12 
-            arcpy.Statistics_analysis(OutTrim, OutTable, "COUNT", "HUC12")
+            arcpy.Statistics_analysis(OutTrim, OutTable, [["FID","COUNT"]], "HUC12")
 #        else if desc.ShapeType == "Polyline": 
 #        else 
       
