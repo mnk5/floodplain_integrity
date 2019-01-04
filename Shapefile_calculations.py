@@ -38,12 +38,15 @@ try:
     arcpy.AddMessage('-----------------------------------------')
     arcpy.AddMessage('ACCESSING SHAPEFILES')
     arcpy.AddMessage(' ')
-
+    
+    # Get area of FP by HUC-12
     arcpy.env.workspace = SHP_FLDR
     FILES = arcpy.ListFeatureClasses()
     
-    arcpy.AddMessage('COUNTING FEATURES BY HUC-12')
+    arcpy.AddMessage('TABULATING FEATURE ABUNDANCE BY HUC-12')
     arcpy.AddMessage(' ')
+    
+    HUC12_area = arcpy.da.SearchCursor(FP, "Area_km2")
     
     for fc in FILES:
         
@@ -58,10 +61,23 @@ try:
         # Location to save files
         OutTrim = Out_path + "\\OutTrim.shp"
         OutTable = Out_path + "\\" + filename + "_table.csv"
+        
         if desc.shapeType == "Point":
 #        # add column of count per huc 12 
             arcpy.Statistics_analysis(OutTrim, OutTable, [["FID","COUNT"]], "HUC12")
-#        else if desc.ShapeType == "Polyline": 
+            
+        elif desc.ShapeType == "Polyline": 
+            
+            # Calculate length of trimmed lines
+            arcpy.AddField_management(fc,"Length_km", "FLOAT")
+            arcpy.CalculateGeometryAttributes_management(fc, [["Length_km", "LENGTH"]], "KILOMETERS" )
+            
+            # Save sum of length by HUC-12 
+            arcpy.Statistics_analysis(OutTrim, OutTable, [["Length_km","SUM"]], "HUC12")
+            
+            # Calculate density of lines as km/ km^2 per HUC-12
+            f = open(OutTable, 'a+')
+            
 #        else 
       
 #%%
