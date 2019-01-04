@@ -4,7 +4,9 @@
 #-------------------------------------------
 
 #Import system modules
-import sys, string, os, arcpy, math, traceback, glob, numpy
+import sys, string, os, arcpy, math, traceback, glob
+import pandas as pd
+import numpy as np
 from arcpy.sa import *
 
 # Allow output to overwrite...
@@ -75,8 +77,12 @@ try:
             # Save sum of length by HUC-12 
             arcpy.Statistics_analysis(OutTrim, OutTable, [["Length_km","SUM"]], "HUC12")
             
-            # Calculate density of lines as km/ km^2 per HUC-12
-            f = open(OutTable, 'a+')
+            # Calculate density of lines as km/ km^2 per HUC-12 and add to csv
+            df = pd.read_csv(OutTable)
+            df['HUC12_Areakm2'] = HUC12_area
+            df['Line_Density'] = df['Length_km']/df['HUC12_Areakm2']
+            df.to_csv(OutTable)
+            
             
 #        else 
       
