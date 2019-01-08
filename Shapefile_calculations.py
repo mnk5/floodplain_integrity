@@ -67,24 +67,44 @@ try:
         if desc.shapeType == "Point":
 #        # add column of count per huc 12 
             arcpy.Statistics_analysis(OutTrim, OutTable, [["FID","COUNT"]], "HUC12")
+                        
+        # Calculate density of points as number/ km^2 per HUC-12 and add to csv
+            df = pd.read_csv(OutTable)
+            df['HUC12_Areakm2'] = HUC12_area
+            df['Point_Density'] = df['COUNT_FID']/df['HUC12_Areakm2']
+            df.to_csv(OutTable)
             
         elif desc.ShapeType == "Polyline": 
             
-            # Calculate length of trimmed lines
+        # Calculate length of trimmed lines
             arcpy.AddField_management(fc,"Length_km", "FLOAT")
             arcpy.CalculateGeometryAttributes_management(fc, [["Length_km", "LENGTH"]], "KILOMETERS" )
+
             
-            # Save sum of length by HUC-12 
+        # Save sum of length by HUC-12 
             arcpy.Statistics_analysis(OutTrim, OutTable, [["Length_km","SUM"]], "HUC12")
             
-            # Calculate density of lines as km/ km^2 per HUC-12 and add to csv
+        # Calculate density of lines as km/ km^2 per HUC-12 and add to csv
             df = pd.read_csv(OutTable)
             df['HUC12_Areakm2'] = HUC12_area
             df['Line_Density'] = df['Length_km']/df['HUC12_Areakm2']
             df.to_csv(OutTable)
             
             
-#        else 
+        else: # for polygons 
+        
+        # Calculate area of trimmed polygons
+            arcpy.AddField_management(fc,"Area_km2", "FLOAT")
+            arcpy.CalculateGeometryAttributes_management(fc, [["Area_km2", "AREA"]], "SQUARE_KILOMETERS" )
+            
+        # Save sum of area by HUC-12 
+            arcpy.Statistics_analysis(OutTrim, OutTable, [["Area_km2","SUM"]], "HUC12")
+            
+        # Calculate density of area per HUC-12 and add to csv
+            df = pd.read_csv(OutTable)
+            df['HUC12_Areakm2'] = HUC12_area
+            df['Area_Density'] = df['Area_km']/df['HUC12_Areakm2']
+            df.to_csv(OutTable)
       
 #%%
 
