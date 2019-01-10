@@ -16,9 +16,12 @@ import numpy as np
 
 #with open("C:\\Users\\mnk5\\Documents\\GIS\\DATA\\Datasets_trimmed\\RESULTS\\NID_CO_table.csv") as csvfile:
 #    writer = csv.writer(csvfile, lineterminator = '\n')
+#
+#OutTable = "C:\\Users\\mnk5\\Documents\\GIS\\DATA\\Datasets_trimmed\\RESULTS\\NID_CO_table.csv"
+#
+#df = pd.read_csv(OutTable)
 
-OutTable = "C:\\Users\\mnk5\\Documents\\GIS\\DATA\\Datasets_trimmed\\RESULTS\\NID_CO_table.csv"
 
-df = pd.read_csv(OutTable)
-df['HUC12_Areakm2'] = 1
-       
+    # Pandads learning test
+    
+test = pd.Series([1,2,5,6])
