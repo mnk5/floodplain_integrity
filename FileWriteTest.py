@@ -17,11 +17,8 @@ import numpy as np
 #with open("C:\\Users\\mnk5\\Documents\\GIS\\DATA\\Datasets_trimmed\\RESULTS\\NID_CO_table.csv") as csvfile:
 #    writer = csv.writer(csvfile, lineterminator = '\n')
 #
-#OutTable = "C:\\Users\\mnk5\\Documents\\GIS\\DATA\\Datasets_trimmed\\RESULTS\\NID_CO_table.csv"
-#
-#df = pd.read_csv(OutTable)
+df = pd.read_csv("C:\\Users\\mnk5\\Documents\\GIS\\DATA\\Datasets_trimmed\\RESULTS\\NID_CO_table.csv")
+FP_df = pd.read_csv("C:\\Users\\mnk5\\Documents\\GIS\\DATA\\Datasets_trimmed\\RESULTS\\FP_area.csv")
+df_results = df.merge(FP_df, on = "HUC12", how='left')
 
 
-    # Pandads learning test
-    
-test = pd.Series([1,2,5,6])

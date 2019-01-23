@@ -51,9 +51,11 @@ try:
     
 #    HUC12_area = arcpy.da.SearchCursor(FP, "Area_km2")
     # write Floodplain area and HUC-12 identifier to Numpy Array
-    HUC12_area = arcpy.da.FeatureClassToNumPyArray(FP, ["HUC12","Area_km2"])
+    HUC12_area = arcpy.da.FeatureClassToNumPyArray(FP, ["HUC12","FP_Areakm2"])
     # Convert Numpy array to Pandas dataframe (see http://geospatialtraining.com/tutorial-creating-a-pandas-dataframe-from-a-shapefile/)
     FP_df = pd.DataFrame(HUC12_area)
+    FP_df.to_csv(Out_path + '\\FP_area.csv')
+    FP_df = pd.read_csv(Out_path + '\\FP_area.csv') #don't know why this has to be read back in from the file, but the merge doesn't work otherwise.
     
     for fc in FILES:
         
@@ -77,8 +79,7 @@ try:
             df = pd.read_csv(OutTable)
             # merge tables of HUC-12 FP area and objects, keeping all HUC-12 entries that have a feature in them
             df_results = df.merge(FP_df, on = "HUC12", how='left')
-            df_results.rename(index=str, columns={"Area_km2": "FP_Area_km2"})
-            df_results['Point_Density'] = df_results['COUNT_FID']/df_results['FP_Area_km2']
+            df_results['Point_Density'] = df_results['COUNT_FID']/df_results['FP_Areakm2']
             df_results.to_csv(OutTable)
         
         
@@ -86,36 +87,37 @@ try:
             
         # Calculate length of trimmed lines
             arcpy.AddField_management(fc,"Length_km", "FLOAT")
-            arcpy.CalculateGeometryAttributes_management(fc, [["Length_km", "LENGTH"]], "KILOMETERS" )
+            arcpy.CalculateField_management(fc, "Length_km", "!shape.length@kilometers!", "PYTHON", "#" )
             
         # Save sum of length by HUC-12 
             arcpy.Statistics_analysis(OutTrim, OutTable, [["Length_km","SUM"]], "HUC12")
             
         # Calculate density of lines as km/ km^2 per HUC-12 and add to csv
             df = pd.read_csv(OutTable)
-            df['HUC12_Areakm2'] = FP_df['Area_km2']
-            df['Line_Density'] = df['Length_km']/df['HUC12_Areakm2']
-            df.to_csv(OutTable)
+            # merge tables of HUC-12 FP area and objects, keeping all HUC-12 entries that have a feature in them
+            df_results = df.merge(FP_df, on = "HUC12", how='left')
+            df_results['Line_Density'] = df_results['SUM_Length_km']/df_results['FP_Areakm2']
+            df_results.to_csv(OutTable)
             
             
         else: # for polygons 
         
         # Calculate area of trimmed polygons
             arcpy.AddField_management(fc,"area_km2", "FLOAT")
-            arcpy.CalculateGeometryAttributes_management(fc, [["area_km2", "AREA"]], "SQUARE_KILOMETERS" )
-            
+            arcpy.CalculateField_management(fc, "area_km2", "!shape.area@squarekilometers!", "PYTHON", "#" )            
         # Save sum of area by HUC-12 
             arcpy.Statistics_analysis(OutTrim, OutTable, [["area_km2","SUM"]], "HUC12")
             
         # Calculate density of area per HUC-12 and add to csv
             df = pd.read_csv(OutTable)
-            df['HUC12_Areakm2'] = HUC12_area
-            df['Area_Density'] = df['area_km2']/df['HUC12_Areakm2']
-            df.to_csv(OutTable)
+            # merge tables of HUC-12 FP area and objects, keeping all HUC-12 entries that have a feature in them
+            df_results = df.merge(FP_df, on = "HUC12", how='left')
+            df_results['Area_Density'] = df_results['SUM_area_km2']/df_results['FP_Areakm2']
+            df_results.to_csv(OutTable)
       
-#
-#    arcpy.AddMessage(' ')
-#    arcpy.AddMessage('FLOODPLAIN PREPROCESSING  COMPLETED!')
+
+    arcpy.AddMessage(' ')
+    arcpy.AddMessage('FLOODPLAIN PREPROCESSING  COMPLETED!')
 except:
      
     arcpy.AddError(arcpy.GetMessages())
