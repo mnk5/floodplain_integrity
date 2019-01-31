@@ -10,18 +10,19 @@ attributefile <- "C:/Users/mnk5/Documents/GIS/DATA/Hyd_Alteration/ByHUC12/Combin
 
 df <- read.csv(attributefile)
 
+
 ## Get data organized by metric and weighting scheme
 
 names <- c("pnMH20", "pnFH1", "pnFH6", "pnFH7", "pnDH1", "pnDH2","pnDH3","pnDH4","pnDH5","pnDH15" )
 
 HydAlt <- list()
-for (n in 7:16){
-  data <- df[,c(n, n+13, n+25, n+37)]
-  colnames(data) <- c("Max","Mean","LengthWeight","OrderWeight")
+for (n in 6:15){
+  data <- df[,c(n, n+12, n+23, n+34, n+48)]
+  colnames(data) <- c("Max","Mean","LengthWeight","OrderWeight","MaxOrderMean")
   # set -999 values from GIS to NA 
   data[data == -999] <- NA
   
-  name <- names[n-6]
+  name <- names[n-5]
   HydAlt[[name]] <- data
   
 }
@@ -57,7 +58,7 @@ for (i in 1:10){
 #############################################
 # Repeat for mean Hyd Alt by Stream order for FP
 
-meandata <- df[,c(20:29, 54)]
+meandata <- df[,c(18:27, 50)]
 # set -999 values from GIS to NA 
 meandata[meandata == -999] <- NA
 
@@ -74,7 +75,7 @@ for (i in 1:10){
 #############################################
 # Repeat for max Hyd Alt by Stream order for FP
 
-maxdata <- df[,c(7:16, 54)]
+maxdata <- df[,c(6:15, 50)]
 # set -999 values from GIS to NA 
 maxdata[maxdata == -999] <- NA
 
@@ -88,5 +89,26 @@ for (i in 1:10){
                                   xlab ='Stream Order', 
                                   ylab = 'Hydologic Alteration',
                                   main = sprintf('Max %s by FP Segment', metric))
+  
+}
+
+
+#############################################
+# Repeat for mean of max order streams only Hyd Alt by Stream order for FP
+
+maxSOdata <- df[,c(54:63, 50)]
+# set -999 values from GIS to NA 
+maxSOdata[maxSOdata == -999] <- NA
+
+## Create boxlpots for each of 10 Hyd Alt metrics for FP segments by Stream Order
+
+par(mar=c(2.1,4.1,2.1,2.1),mfrow = c(5,2))
+for (i in 1:10){
+  
+  metric <- names[i]
+  boxplot(maxSOdata[,i] ~ StrmOrder, data = maxSOdata, 
+          xlab ='Stream Order', 
+          ylab = 'Hydologic Alteration',
+          main = sprintf('Mean of Max Order Streams %s by FP Segment', metric))
   
 }
