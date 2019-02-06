@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 library(ggplot2)
-
+library(lsmeans)
 
 
 ## load in table with weighted hydrologic alteration values
@@ -36,6 +36,14 @@ for (i in 1:length(HydAlt)){
       ylab = 'Hydologic Alteration',
       main = names[i])
 }
+
+
+## Test for statistically sig difference
+
+method.lm <- lapply(HydAlt, function(x) lm(values ~ ind, data = stack(x)))
+# results <-lapply(method.aov, function(x) summary(x))
+method.pairwise <- lapply(method.lm, function(x) lsmeans(x, pairwise ~ ind))
+method.contrasts <- lapply(method.pairwise, function(x) x$contrasts)
 
 #############################################
 ## look at hyd alteration metrics by order
