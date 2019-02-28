@@ -1,8 +1,10 @@
 #####################
+# Floodplain Integrity Assessment
+# Stressor data correlation analysis
+# M. Karpack, Spring 2019
 
-# Floodplain Integrity Metric analysis
 
-# Code to take all data tables and assimilate
+# Code to take all data tables from GIS data exports and assimilate
 # And then check for correllation using Pearson's correlation coeffcient
 
 library(lsmeans)

@@ -1,4 +1,10 @@
-# -*- coding: utf-8 -*-
+################
+# Floodplain Integrity Assessment 
+# Hydrologic Alteration Metric Comparison
+# M. Karpack, Spring 2019
+
+# Comparison of Hydrologic Alteration metrics provided by R. McManamay
+# at the stream level and aggregated to the HUC-12 unit using several different methods
 
 library(ggplot2)
 library(lsmeans)
