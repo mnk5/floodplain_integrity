@@ -30,34 +30,37 @@ for (i in 1:length(filelist)){
 ## Get all information relevant into one df using FP HUC-12 as basis
 
 data.merge <- merge(FP_Info[,c("HUC12", "FP_Areakm2", "StrmOrder")], AgricultureArea[, c("HUC12", "MEAN")], by = "HUC12", all.x = TRUE)
-colnames(data.merge)[colnames(data.merge)=="MEAN"] <- "Agr"
+colnames(data.merge)[colnames(data.merge)=="MEAN"] <- "Agriculture"
 
 data.merge <- merge(data.merge, Buildings[, c("HUC12", "Area_Density")], by = "HUC12", all.x = TRUE)
-colnames(data.merge)[colnames(data.merge)=="Area_Density"] <- "Build"
+colnames(data.merge)[colnames(data.merge)=="Area_Density"] <- "Buildings"
 
 data.merge <- merge(data.merge, CanalDitch[, c("HUC12", "Line_Density")], by = "HUC12", all.x = TRUE)
-colnames(data.merge)[colnames(data.merge)=="Line_Density"] <- "Ditch"
+colnames(data.merge)[colnames(data.merge)=="Line_Density"] <- "Ditches"
 
 data.merge <- merge(data.merge, DevelopedArea[, c("HUC12", "MEAN")], by = "HUC12", all.x = TRUE)
-colnames(data.merge)[colnames(data.merge)=="MEAN"] <- "Dev"
+colnames(data.merge)[colnames(data.merge)=="MEAN"] <- "Developed"
 
 data.merge <- merge(data.merge, ForestLoss[, c("HUC12", "MEAN")], by = "HUC12", all.x = TRUE)
-colnames(data.merge)[colnames(data.merge)=="MEAN"] <- "ForLoss"
+colnames(data.merge)[colnames(data.merge)=="MEAN"] <- "ForestLoss"
 
 data.merge <- merge(data.merge, ImperviousArea[, c("HUC12", "MEAN")], by = "HUC12", all.x = TRUE)
-colnames(data.merge)[colnames(data.merge)=="MEAN"] <- "Imperv"
+colnames(data.merge)[colnames(data.merge)=="MEAN"] <- "Impervious"
 
 data.merge <- merge(data.merge, LeveedArea[, c("HUC12", "Area_Density")], by = "HUC12", all.x = TRUE)
-colnames(data.merge)[colnames(data.merge)=="Area_Density"] <- "Levee"
+colnames(data.merge)[colnames(data.merge)=="Area_Density"] <- "LeveedArea"
+
+data.merge <- merge(data.merge, NonNativeVeg[, c("HUC12", "MEAN")], by = "HUC12", all.x = TRUE)
+colnames(data.merge)[colnames(data.merge)=="MEAN"] <- "NonNativeVeg"
 
 data.merge <- merge(data.merge, Railroads[, c("HUC12", "Line_Density")], by = "HUC12", all.x = TRUE)
-colnames(data.merge)[colnames(data.merge)=="Line_Density"] <- "RR"
+colnames(data.merge)[colnames(data.merge)=="Line_Density"] <- "Railroads"
 
 data.merge <- merge(data.merge, Roads[, c("HUC12", "Line_Density")], by = "HUC12", all.x = TRUE)
-colnames(data.merge)[colnames(data.merge)=="Line_Density"] <- "Road"
+colnames(data.merge)[colnames(data.merge)=="Line_Density"] <- "Roads"
 
 data.merge <- merge(data.merge, WellStructures[, c("HUC12", "Point_Density")], by = "HUC12", all.x = TRUE)
-colnames(data.merge)[colnames(data.merge)=="Point_Density"] <- "Well"
+colnames(data.merge)[colnames(data.merge)=="Point_Density"] <- "Wells"
 
 data.merge <- merge(data.merge, MeanHA_MaxOrderOnly[, c("HUC12", "MEAN_pnMH20", "MEAN_pnFH1","MEAN_pnFH6",
                                                         "MEAN_pnFH7","MEAN_pnDH1", "MEAN_pnDH2","MEAN_pnDH3",
@@ -90,9 +93,12 @@ Correl.NA <- cor(data.merge.NA[,4:length(data.merge.NA)], use = "pairwise.comple
 # Significance test
 res.NA <- cor.mtest(data.merge.NA[,4:length(data.merge.NA)], conf.level =0.95)
 
-# Plotting correlations
-corrplot(Correl.NA, type = "upper", method = "circle", tl.col="black", tl.srt=45,
-         diag=FALSE, addCoef.col = "#909196",number.cex = .7, cl.pos ="n")
+# Plotting (and saving) correlations
+out.graph.NA <- paste(out.path, "Correlation_NA.jpg", sep="")
+jpeg(out.graph.NA, width = 2000, height = 2000, units = "px")
+corrplot(Correl.NA, type = "upper", method = "color", tl.col="black", tl.srt=45,
+         tl.cex= 2.5, diag=FALSE, addCoef.col = "#9fa0a5",number.cex = 2, cl.pos ="n")
+dev.off()
 
 
 # Correlation analysis (w zero instead of NA)
@@ -101,6 +107,11 @@ Correl <- cor(data.merge[,4:length(data.merge)], use = "pairwise.complete.obs")
 # Significance test
 res <- cor.mtest(data.merge[,4:length(data.merge)], conf.level =0.95)
 
-# Plotting correlations
-corrplot(Correl, type = "upper", method = "circle", tl.col="black", tl.srt=45, 
-         diag=FALSE, addCoef.col = "#909196", number.cex = .7, cl.pos ="n")
+# Plotting (and saving) correlations
+out.graph <- paste(out.path, "Correlation.jpg", sep="")
+jpeg(out.graph, width = 2000, height = 2000, units = "px")
+corrplot(Correl, type = "upper", method = "color", tl.col="black", tl.srt=45, 
+         tl.cex= 2.5, diag=FALSE, addCoef.col = "#9fa0a5", number.cex = 2, cl.pos ="n")
+dev.off()
+
+
