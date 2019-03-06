@@ -49,7 +49,6 @@ try:
     arcpy.AddMessage(' ')
     
     
-#    HUC12_area = arcpy.da.SearchCursor(FP, "Area_km2")
     # write Floodplain area and HUC-12 identifier to Numpy Array
     HUC12_area = arcpy.da.FeatureClassToNumPyArray(FP, ["HUC12","FP_Areakm2"])
     # Convert Numpy array to Pandas dataframe (see http://geospatialtraining.com/tutorial-creating-a-pandas-dataframe-from-a-shapefile/)
@@ -86,8 +85,8 @@ try:
         elif desc.ShapeType == "Polyline": 
             
         # Calculate length of trimmed lines
-            arcpy.AddField_management(fc,"Length_km", "FLOAT")
-            arcpy.CalculateField_management(fc, "Length_km", "!shape.length@kilometers!", "PYTHON", "#" )
+            arcpy.AddField_management(OutTrim,"Length_km", "FLOAT")
+            arcpy.CalculateField_management(OutTrim, "Length_km", "!shape.length@kilometers!", "PYTHON", "#" )
             
         # Save sum of length by HUC-12 
             arcpy.Statistics_analysis(OutTrim, OutTable, [["Length_km","SUM"]], "HUC12")
@@ -103,8 +102,8 @@ try:
         else: # for polygons 
         
         # Calculate area of trimmed polygons
-            arcpy.AddField_management(fc,"area_km2", "FLOAT")
-            arcpy.CalculateField_management(fc, "area_km2", "!shape.area@squarekilometers!", "PYTHON", "#" )            
+            arcpy.AddField_management(OutTrim,"area_km2", "FLOAT")
+            arcpy.CalculateField_management(OutTrim, "area_km2", "!shape.area@squarekilometers!", "PYTHON", "#" )            
         # Save sum of area by HUC-12 
             arcpy.Statistics_analysis(OutTrim, OutTable, [["area_km2","SUM"]], "HUC12")
             
