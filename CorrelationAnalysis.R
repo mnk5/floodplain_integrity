@@ -53,11 +53,16 @@ colnames(data.merge)[colnames(data.merge)=="Area_Density"] <- "LeveedArea"
 data.merge <- merge(data.merge, NonNativeVeg[, c("HUC12", "MEAN")], by = "HUC12", all.x = TRUE)
 colnames(data.merge)[colnames(data.merge)=="MEAN"] <- "NonNativeVeg"
 
-data.merge <- merge(data.merge, Railroads[, c("HUC12", "Line_Density")], by = "HUC12", all.x = TRUE)
-colnames(data.merge)[colnames(data.merge)=="Line_Density"] <- "Railroads"
+data.merge <- merge(data.merge, RoadsRailroads[, c("HUC12", "Line_Density")], by = "HUC12", all.x = TRUE)
+colnames(data.merge)[colnames(data.merge)=="Line_Density"] <- "Roads_Rail"
 
-data.merge <- merge(data.merge, Roads[, c("HUC12", "Line_Density")], by = "HUC12", all.x = TRUE)
-colnames(data.merge)[colnames(data.merge)=="Line_Density"] <- "Roads"
+# Combined roads and railroads into one line file
+
+# data.merge <- merge(data.merge, Railroads[, c("HUC12", "Line_Density")], by = "HUC12", all.x = TRUE)
+# colnames(data.merge)[colnames(data.merge)=="Line_Density"] <- "Railroads"
+# 
+# data.merge <- merge(data.merge, Roads[, c("HUC12", "Line_Density")], by = "HUC12", all.x = TRUE)
+# colnames(data.merge)[colnames(data.merge)=="Line_Density"] <- "Roads"
 
 data.merge <- merge(data.merge, WellStructures[, c("HUC12", "Point_Density")], by = "HUC12", all.x = TRUE)
 colnames(data.merge)[colnames(data.merge)=="Point_Density"] <- "Wells"
