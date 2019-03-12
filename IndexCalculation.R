@@ -8,10 +8,13 @@
 
 library(ggplot2)
 library(RColorBrewer)
+library(corrplot)
+library(emmeans)
 
 
 # set path to Git folder
 basepath <- "C:/Users/mnk5/Documents/floodplain_integrity"
+out.path <- paste(basepath, "/Outputs/", sep="") # for saving outputss
 
 # Load csv file of stressor data from "CorrelationAnalysis.R" script output
 data.path <- paste(basepath, "/Outputs/Combined_Data.csv", sep="")
@@ -49,7 +52,7 @@ stressors$Wells <- stressors$Wells/max(stressors$Wells)
 stressors$Buildings <- stressors$Buildings/max(stressors$Buildings)
 
 # Compare all measures
-boxplot(stressors, use.cols = TRUE)
+# boxplot(stressors, use.cols = TRUE)
 
 
 # Make neagtive 
@@ -82,8 +85,8 @@ for (i in 1:length(data.byfunction)) {
   Function.Index[,i] <- rowMeans(stressors.neg[,data.byfunction[[i]]])
 }
 
-colnames(Function.Index) <- c("Floods", "Groudwater", "Sediment", 
-                              "Organic/Solutes", "Habitat")
+colnames(Function.Index) <- c("Floods", "Groundwater", "Sediment", 
+                              "Organics/Solutes", "Habitat")
 
 
 # plot boxplot of index by function
@@ -95,8 +98,30 @@ function.plot <- ggplot(stack(Function.Index), aes(x = ind, y = values)) +
   ggtitle("Index of Floodplain Integrity by Function")
 function.plot
 
-# Compute overall Index of floodplain Integrity
+# plot correlation of Indices
 
+function.cor <- cor(Function.Index, use = "pairwise.complete.obs")
+
+out.graph <- paste(out.path, "IFI_Correlation.jpg", sep="")
+jpeg(out.graph, width = 2000, height = 2000, units = "px")
+corrplot(function.cor, type = "upper", method = "circle", tl.col="black", tl.srt=45,
+         tl.cex= 4.5, diag=FALSE, addCoef.col = "#9fa0a5", number.cex = 4, cl.pos ="n")
+dev.off()
+
+
+
+# Compute overall Index of floodplain Integrity
+IFI <- data.frame(IFI.geomean = apply(Function.Index, 1, prod)^(1/5))
+IFI.product <- data.frame(IFI.prod = apply(Function.Index, 1, prod))
+IFI.comb <- data.frame(IFI,IFI.product)
+
+IFI.plot <- ggplot(stack(IFI.comb), aes(x = ind, y = values)) + 
+  scale_y_continuous(limits = c(0,1)) +
+  geom_boxplot() +
+  xlab("") +
+  ylab("Index of Floodplain Integrity") 
+
+IFI.plot
 
 # Compute index using percentiles
 
