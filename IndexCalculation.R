@@ -10,6 +10,7 @@ library(ggplot2)
 library(RColorBrewer)
 library(corrplot)
 library(emmeans)
+library(psych)
 
 
 # set path to Git folder
@@ -35,7 +36,7 @@ for (i in 4:ncol(all.data)){
 
 #####################
 # Get only final stressors and HUC-12 Identifier into df
-HUC12 <- all.data$HUC12
+
 keep.columns <- c("Agriculture", "Buildings", "Ditches", "Developed", "ForestLoss",
                   "Impervious", "LeveedArea", "NonNativeVeg", "Roads_Rail","Wells", "MH20")
 stressors <- all.data[, keep.columns]
@@ -123,10 +124,118 @@ IFI.plot <- ggplot(stack(IFI.comb), aes(x = ind, y = values)) +
 
 IFI.plot
 
-# Compute index using percentiles
+###################################
+# GEO MEAN
+
+# Compute index using geometric mean
+Function.Index.Geo <- data.frame(matrix(NA, nrow = nrow(stressors.neg), ncol = length(data.byfunction)))
+
+for (i in 1:length(data.byfunction)) {
+  Function.Index.Geo[,i] <- apply(stressors.neg[,data.byfunction[[i]]], 1, function(x) geometric.mean(x))
+}
+
+colnames(Function.Index.Geo) <- c("Floods", "Groundwater", "Sediment", 
+                              "Organics/Solutes", "Habitat")
 
 
 
+# plot boxplot of index by function with geomean
+function.plot.geo <- ggplot(stack(Function.Index.Geo), aes(x = ind, y = values)) + 
+  geom_boxplot() +
+  scale_y_continuous(limits = c(0,1)) +
+  xlab("Floodplain Function") +
+  ylab("Integrity Index") +
+  ggtitle("Index of Floodplain Integrity by Function, Geometric Mean")
+function.plot.geo
+
+# Compute overall Index of floodplain Integrity with Geo Mean
+IFI.geo <- data.frame(IFI.geomean = apply(Function.Index.Geo, 1, prod)^(1/5))
+IFI.product.geo <- data.frame(IFI.prod = apply(Function.Index.Geo, 1, prod))
+IFI.comb.geo <- data.frame(IFI.geo,IFI.product.geo)
+
+IFI.plot.geo <- ggplot(stack(IFI.comb.geo), aes(x = ind, y = values)) + 
+  scale_y_continuous(limits = c(0,1)) +
+  geom_boxplot() +
+  xlab("") +
+  ylab("Index of Floodplain Integrity, Function Geometric Mean") 
+
+IFI.plot.geo
+
+###########################
+# Cap stressors at 75th percentile
+
+stressors.scaled <- stressors # initialize vector
+
+# loop over stressors
+for (i in 1:ncol(stressors)) {
+  # find 90th percentile
+  limit <- quantile(stressors[,i], probs = 0.90)
+  
+  # for non-zero 90th percentiles, compute as relative to 90th percentile
+  if (limit != 0) {
+    stressors.scaled[,i] <- stressors.scaled[,i]/limit
+    # set values over 90th percentile to 1
+    stressors.scaled[,i][stressors.scaled[,i]>1] <- 1
+  } else {
+    # if 90th percentile is 0, scale relative to max value
+    stressors.scaled[,i] <- stressors.scaled[,i]/max(stressors.scaled[,i])
+  }
+    
+}
+
+## Boxplot scaled stressors
+boxplot(stressors.scaled, use.cols = TRUE)
 
 
+# Compute  Index as average of stressors scaled for each function
+Function.Index.Scaled <- data.frame(matrix(NA, nrow = nrow(stressors.scaled), ncol = length(data.byfunction)))
+
+for (i in 1:length(data.byfunction)) {
+  Function.Index.Scaled[,i] <- 1 - rowMeans(stressors.scaled[,data.byfunction[[i]]])
+}
+
+colnames(Function.Index.Scaled) <- c("Floods", "Groundwater", "Sediment", 
+                              "Organics/Solutes", "Habitat")
+
+
+# plot boxplot of index by function
+function.plot.scaled <- ggplot(stack(Function.Index.Scaled), aes(x = ind, y = values)) + 
+  geom_boxplot() +
+  scale_y_continuous(limits = c(0,1)) +
+  xlab("Floodplain Function") +
+  ylab("Integrity Index") +
+  ggtitle("Index of Floodplain Integrity by Function, Scaled Stressors")
+function.plot.scaled
+
+# plot correlation of Indices
+
+function.scaled.cor <- cor(Function.Index.Scaled, use = "pairwise.complete.obs")
+
+out.graph <- paste(out.path, "IFI_Scaled_Correlation.jpg", sep="")
+jpeg(out.graph, width = 2000, height = 2000, units = "px")
+corrplot(function.scaled.cor, type = "upper", method = "circle", tl.col="black", tl.srt=45,
+         tl.cex= 4.5, diag=FALSE, addCoef.col = "#9fa0a5", number.cex = 4, cl.pos ="n")
+dev.off()
+
+
+
+# Compute overall Index of floodplain Integrity
+IFI.scaled <- data.frame(IFI.geomean = apply(Function.Index.Scaled, 1, function(x) geometric.mean(x)))
+IFI.product.scaled <- data.frame(IFI.prod = apply(Function.Index.Scaled, 1, prod))
+IFI.comb.scaled <- data.frame(IFI.scaled,IFI.product.scaled)
+
+IFI.scaled.plot <- ggplot(stack(IFI.comb.scaled), aes(x = ind, y = values)) + 
+  scale_y_continuous(limits = c(0,1)) +
+  geom_boxplot() +
+  xlab("") +
+  ylab("Index of Floodplain Integrity, scaled stressors") 
+
+IFI.scaled.plot
+
+# Export to csv
+HUC12 <- all.data$HUC12
+
+combined.data <- data.frame(HUC12,Function.Index.Scaled,IFI.comb.scaled)
+IFI.outfile <- paste(out.path, "IFI_Scaled.csv", sep="")
+write.csv(combined.data, file = IFI.outfile)
 
