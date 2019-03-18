@@ -17,7 +17,7 @@ library(RColorBrewer)
 basepath <- "C:/Users/mnk5/Documents/floodplain_integrity"
 
 # Load all csv files in folder into list
-data.path <- paste(basepath, "/RawData/", sep="")
+data.path <- paste(basepath, "/RawData/StressorData/", sep="")
 filelist <- list.files(path = data.path, pattern="*.csv")
 
 # read in each .csv file in folder and create a data frame with the same name as the .csv file
