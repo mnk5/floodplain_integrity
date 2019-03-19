@@ -49,16 +49,18 @@ stressors$Ditches <- stressors$Ditches/max(stressors$Ditches)
 stressors$Roads_Rail <- stressors$Roads_Rail/max(stressors$Roads_Rail)
 stressors$Wells <- stressors$Wells/max(stressors$Wells)
 
-# Scale buildings to max building density in CO
-stressors$Buildings <- stressors$Buildings/max(stressors$Buildings)
 
 # Compare all measures
-# boxplot(stressors, use.cols = TRUE)
+boxplot(stressors, use.cols = TRUE, ylab = 'Stressor Density')
+
+
+# Scale buildings to max building density in CO
+stressors$Buildings <- stressors$Buildings/max(stressors$Buildings)
 
 
 # Make neagtive 
 stressors.neg <- 1-stressors
-boxplot(stressors.neg, use.cols = T)
+# boxplot(stressors.neg, use.cols = T)
 
 #####################
 # Calculate functions as average of stressors
@@ -106,7 +108,7 @@ function.cor <- cor(Function.Index, use = "pairwise.complete.obs")
 out.graph <- paste(out.path, "IFI_Correlation.jpg", sep="")
 jpeg(out.graph, width = 2000, height = 2000, units = "px")
 corrplot(function.cor, type = "upper", method = "circle", tl.col="black", tl.srt=45,
-         tl.cex= 4.5, diag=FALSE, addCoef.col = "#9fa0a5", number.cex = 4, cl.pos ="n")
+         tl.cex= 4.5, diag=FALSE, addCoef.col = "#bbbcc1", number.cex = 4, cl.pos ="n")
 dev.off()
 
 
@@ -165,6 +167,7 @@ IFI.plot.geo
 # Cap stressors at 75th percentile
 
 stressors.scaled <- stressors # initialize vector
+percent.capped <- list()
 
 # loop over stressors
 for (i in 1:ncol(stressors)) {
@@ -174,17 +177,24 @@ for (i in 1:ncol(stressors)) {
   # for non-zero 90th percentiles, compute as relative to 90th percentile
   if (limit != 0) {
     stressors.scaled[,i] <- stressors.scaled[,i]/limit
+    
+    # Count percentage of data being capped to one
+    percent.capped[[i]] <- sum(stressors.scaled[,i]>1)/nrow(stressors.scaled)
+    
     # set values over 90th percentile to 1
     stressors.scaled[,i][stressors.scaled[,i]>1] <- 1
+    
   } else {
     # if 90th percentile is 0, scale relative to max value
     stressors.scaled[,i] <- stressors.scaled[,i]/max(stressors.scaled[,i])
+    
+    percent.capped[[i]] <- 0
   }
     
 }
 
 ## Boxplot scaled stressors
-boxplot(stressors.scaled, use.cols = TRUE)
+boxplot(stressors.scaled, use.cols = TRUE, ylab = 'Scaled Stressor Density')
 
 
 # Compute  Index as average of stressors scaled for each function
@@ -214,7 +224,7 @@ function.scaled.cor <- cor(Function.Index.Scaled, use = "pairwise.complete.obs")
 out.graph <- paste(out.path, "IFI_Scaled_Correlation.jpg", sep="")
 jpeg(out.graph, width = 2000, height = 2000, units = "px")
 corrplot(function.scaled.cor, type = "upper", method = "circle", tl.col="black", tl.srt=45,
-         tl.cex= 4.5, diag=FALSE, addCoef.col = "#9fa0a5", number.cex = 4, cl.pos ="n")
+         tl.cex= 4.5, diag=FALSE, addCoef.col = "#bbbcc1", number.cex = 4, cl.pos ="n")
 dev.off()
 
 
