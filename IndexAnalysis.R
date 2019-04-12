@@ -34,7 +34,7 @@ functions <- c("Floods", "Groundwate", "Sediment", "Organics_S", "Habitat")
 func.IFI <- all.data[, functions]
 colnames(func.IFI) <- c("Floods", "Groundwater", "Sediment", "Organics_Solutes", "Habitat")
 
-colnames(func.IFI)[which(names(func.IFI) == "IFI_geomean")] <- "Overall IFI"
+# colnames(func.IFI)[which(names(func.IFI) == "IFI_geomean")] <- "Overall IFI"
 
 p <- ggplot(gather(func.IFI), aes(value)) +
   geom_histogram(bins = 20) +
@@ -289,3 +289,20 @@ R2.ICI <- summary(ICI.lm)$r.squared
 
 # Look at distribution of ICI values (very few over 0.8)
 # hist(ICI.comp$ICI, xlim = c(0,1))
+
+
+################################
+# Sensitivity analysis of Function IFI results
+
+# Numeric value (1 to 5) to represent function with min value
+func.sensitivity <- data.frame(min.func = apply(func.IFI, 1, which.min))
+
+# add function names
+func.lookup <- data.frame(num = seq(1,5), names = c("Floods", "Groundwater", "Sediment",
+                                                    "Organics/Solutes", "Habitat"))
+func.sensitivity$min.func.name <- func.lookup$names[match(unlist(func.sensitivity$min.func), func.lookup$num)]
+
+
+func.sensitivity$std.dev <- apply(func.IFI, 1, sd)
+func.sensitivity$CV <- func.sensitivity$std.dev/all.data$IFI_geomean
+
