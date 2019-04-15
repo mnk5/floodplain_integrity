@@ -295,14 +295,34 @@ R2.ICI <- summary(ICI.lm)$r.squared
 # Sensitivity analysis of Function IFI results
 
 # Numeric value (1 to 5) to represent function with min value
-func.sensitivity <- data.frame(min.func = apply(func.IFI, 1, which.min))
+func.sensitivity <- data.frame(HUC12 = as.character(all.data$HUC12))
+func.sensitivity$min.func <- apply(func.IFI, 1, which.min)
 
 # add function names
 func.lookup <- data.frame(num = seq(1,5), names = c("Floods", "Groundwater", "Sediment",
                                                     "Organics/Solutes", "Habitat"))
 func.sensitivity$min.func.name <- func.lookup$names[match(unlist(func.sensitivity$min.func), func.lookup$num)]
 
-
+# Standard deviation of function IFI
 func.sensitivity$std.dev <- apply(func.IFI, 1, sd)
+
+# Modified coefficient of variation (sd of functions / overall IFI (geomean))
 func.sensitivity$CV <- func.sensitivity$std.dev/all.data$IFI_geomean
 
+# Plots to visualize sesitivity
+func.plot <- ggplot(func.sensitivity, aes(min.func.name)) +
+  geom_bar() +
+  xlab("Function with Minimum IFI") +
+  ylab("Number of Floodplain Units") +
+  theme_bw()
+func.plot
+
+sd.hist <- ggplot(func.sensitivity, aes(x = std.dev)) +
+  geom_histogram(binwidth = 0.02) +
+  xlab("Standard deviation of Function IFI") +
+  ylab("Number of Floodplain Units") +
+  theme_bw()
+sd.hist
+
+# output result as csv
+write.csv(func.sensitivity, file = paste(out.path, "/IFI_sensitivity.csv", sep=""))
