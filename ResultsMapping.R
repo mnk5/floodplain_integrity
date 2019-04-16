@@ -15,6 +15,7 @@ library(tidyr)
 library(broom)
 library(gridExtra)
 library(reshape2)
+library(ggmap)
 
 # Set working directory
 setwd("C:/Users/mnk5/Documents/floodplain_integrity")
@@ -23,6 +24,8 @@ setwd("C:/Users/mnk5/Documents/floodplain_integrity")
 floodplain <- readOGR(dsn = "RawData/SpatialData", layer = "CO_FP_IFI")
 CO.boundary <- readOGR(dsn = "RawData/SpatialData", layer = "CO_StateBoundary_UTM")
 CO.HUC12 <- readOGR(dsn = "RawData/SpatialData", layer = "CO_HUC12")
+# NHD v1 segments order 4 and larger in Colorado
+CO.rivers <- readOGR(dsn = "RawData/SpatialData", layer = "NHDv1_Order4_CO")
 
 # Clean data
 floodplain$HUC12 <- as.character(floodplain$HUC12)
@@ -35,8 +38,32 @@ floodplain.df <- left_join(floodplain_tidy, floodplain@data, by = c("id" = "HUC1
 CO.boundary@data$id <- row.names(CO.boundary@data)
 CO.boundary_tidy <- tidy(CO.boundary, region = 'id')
 
+CO.rivers@data$id <- row.names(CO.rivers@data)
+CO.rivers_tidy <- tidy(CO.rivers, region = 'id')
 
+###############################
 # Plot results
+
+# choose bounding box area for zoomed in area
+zoomsize <- 60000
+xlimits <- c(480000,480000 + zoomsize)
+ylimits <- c(4520000, 4520000 - zoomsize)
+
+# Floodplains in state
+map <- ggplot(data = floodplain.df, aes(x = long, y = lat, group = group)) + 
+  geom_polygon(data = CO.boundary_tidy, aes(x = long, y = lat, group = group), fill = "grey97") +
+  geom_polygon(data = floodplain.df, aes(x = long, y = lat, group = group), fill = "grey63") +
+  geom_path(data = CO.rivers_tidy, aes(x = long, y = lat, group = group), color = "navy", size = 1) +
+  geom_rect(aes(xmin = min(xlimits), xmax = max(xlimits), ymin = min(ylimits), ymax = max(ylimits)),
+            fill = "transparent", color = "red", size = 1.5) +
+  coord_equal() +
+  labs(x = NULL, y = NULL) +
+  theme_minimal(base_size = 14) + 
+  theme(legend.text = element_text(size = 8)) +
+  theme(axis.text=element_blank()) +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+
+map
 
 # Overall IFI
 map1 <- ggplot(data = floodplain.df, aes(x = long, y = lat, group = group, fill = IFI_geomea)) + 
@@ -52,19 +79,21 @@ map1 <- map1 + theme_minimal(base_size = 14) +
 
 map1
 
-# All IFI by function
-# 
-# map2 <- ggplot(data = floodplain.df, aes(x = long, y = lat, group = group, fill = Floods)) + 
+# # All IFI by function
+# # 
+# map2 <- ggplot(data = floodplain.df, aes(x = long, y = lat, group = group, fill = Floods)) +
 #   geom_polygon(data = CO.boundary_tidy, aes(x = long, y = lat, group = group), fill = "grey93") +
 #   geom_polygon() +
-#   coord_equal() +
+#   coord_fixed(ratio = 1, xlim = c(442000,618000), ylim = c(4520000, 4360000)) +
 #   scale_fill_gradientn(colours = c("chocolate4", "wheat1" ,"darkcyan"), breaks = seq(0, 1, by = 0.1)) +
 #   labs(x = NULL, y = NULL, fill = "IFI") +
 #   ggtitle("a) Flood Reduction IFI") +
-#   theme_minimal(base_size = 10) + 
+#   theme_minimal(base_size = 10) +
 #   theme(legend.position = "none") +
-#   theme(axis.text=element_blank()) +
+#   # theme(axis.text=element_blank()) +
 #   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+# map2
+
 # 
 # map3 <- ggplot(data = floodplain.df, aes(x = long, y = lat, group = group, fill = Groundwate)) + 
 #   geom_polygon(data = CO.boundary_tidy, aes(x = long, y = lat, group = group), fill = "grey93") +
@@ -118,21 +147,27 @@ map1
 # grid.arrange(map2, map3, map4, map5, map6, nrow = 3)
 
 
-# Alternate Method
-fp.df <- melt(floodplain.df, id = 1:10, measure = 10:14 )
+# Mapping zoomed in area IFI by function
+fp.df <- melt(floodplain.df, id = 1:9, measure = 10:15)
 levels(fp.df$variable) = c("Flood Reduction", "Groundwater Storage", "Sediment Regulation",
                            "Organics/Solutes Regulation", "Habitat Provision", "Overall IFI")
 
+
+
 map7 <- ggplot(data = fp.df, aes(x = long, y = lat, group = group, fill = value)) + 
-  geom_polygon(data = CO.boundary_tidy, aes(x = long, y = lat, group = group), fill = "grey93") +
+  # geom_polygon(data = CO.boundary_tidy, aes(x = long, y = lat, group = group), fill = "grey93") +
+  ggmap(get_map(location = bbox(CO.boundary), source = "osm", maptype = "toner", color = "bw")) +
   geom_polygon() +
-  coord_equal() +
-  facet_wrap(~ variable, ncol = 2) +
-  scale_fill_gradientn(colours = c("chocolate4", "wheat1" ,"darkcyan"), breaks = seq(0, 1, by = 0.1)) +
+  # coord_equal() +
+  coord_fixed(ratio = 1, xlim = xlimits, ylim = ylimits) +
+  facet_wrap(~ variable, ncol = 3) +
+  scale_fill_gradientn(colours = c("chocolate4", "wheat1" ,"darkcyan"), breaks = seq(0, 1, by = 0.2)) +
   labs(x = NULL, y = NULL, fill = "IFI") +
   theme_minimal(base_size = 12) + 
-  theme(legend.position = c(0.8,0.08), legend.justification = c(1,0)) +
-  theme(legend.text = element_text(size = 8)) +
-  theme(axis.text=element_blank()) +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+  theme(#panel.background = element_rect(fill = "grey93"),
+        panel.border = element_rect(fill = NA, colour = "black"),
+        legend.position = "bottom",
+        legend.text = element_text(size = 8),
+        axis.text=element_blank(),
+        panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 map7

@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata xml:lang="en"><Esri><CreaDate>20190415</CreaDate><CreaTime>13413200</CreaTime><ArcGISFormat>1.0</ArcGISFormat><SyncOnce>TRUE</SyncOnce><DataProperties><lineage><Process ToolSource="c:\program files (x86)\arcgis\desktop10.3\ArcToolbox\Toolboxes\Analysis Tools.tbx\Intersect" Date="20190415" Time="134132">Intersect "NHDV1_flowlines #;CO_StateBoundary_UTM #" C:\Users\mnk5\Documents\GIS\DATA\Datasets_trimmed\NHDv1_Order4_CO.shp ALL # INPUT</Process></lineage></DataProperties></Esri></metadata>
