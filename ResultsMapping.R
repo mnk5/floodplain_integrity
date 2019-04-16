@@ -52,8 +52,8 @@ ylimits <- c(4520000, 4520000 - zoomsize)
 # Floodplains in state
 map <- ggplot(data = floodplain.df, aes(x = long, y = lat, group = group)) + 
   geom_polygon(data = CO.boundary_tidy, aes(x = long, y = lat, group = group), fill = "grey97") +
-  geom_polygon(data = floodplain.df, aes(x = long, y = lat, group = group), fill = "grey63") +
-  geom_path(data = CO.rivers_tidy, aes(x = long, y = lat, group = group), color = "navy", size = 1) +
+  geom_polygon(data = floodplain.df, aes(x = long, y = lat, group = group), fill = "grey50") +
+  geom_path(data = CO.rivers_tidy, aes(x = long, y = lat, group = group), color = "mediumblue", size = 0.25) +
   geom_rect(aes(xmin = min(xlimits), xmax = max(xlimits), ymin = min(ylimits), ymax = max(ylimits)),
             fill = "transparent", color = "red", size = 1.5) +
   coord_equal() +
@@ -80,72 +80,6 @@ map1 <- map1 + theme_minimal(base_size = 14) +
 map1
 
 # # All IFI by function
-# # 
-# map2 <- ggplot(data = floodplain.df, aes(x = long, y = lat, group = group, fill = Floods)) +
-#   geom_polygon(data = CO.boundary_tidy, aes(x = long, y = lat, group = group), fill = "grey93") +
-#   geom_polygon() +
-#   coord_fixed(ratio = 1, xlim = c(442000,618000), ylim = c(4520000, 4360000)) +
-#   scale_fill_gradientn(colours = c("chocolate4", "wheat1" ,"darkcyan"), breaks = seq(0, 1, by = 0.1)) +
-#   labs(x = NULL, y = NULL, fill = "IFI") +
-#   ggtitle("a) Flood Reduction IFI") +
-#   theme_minimal(base_size = 10) +
-#   theme(legend.position = "none") +
-#   # theme(axis.text=element_blank()) +
-#   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
-# map2
-
-# 
-# map3 <- ggplot(data = floodplain.df, aes(x = long, y = lat, group = group, fill = Groundwate)) + 
-#   geom_polygon(data = CO.boundary_tidy, aes(x = long, y = lat, group = group), fill = "grey93") +
-#   geom_polygon() +
-#   coord_equal() +
-#   scale_fill_gradientn(colours = c("chocolate4", "wheat1" ,"darkcyan"), breaks = seq(0, 1, by = 0.1)) +
-#   labs(x = NULL, y = NULL, fill = "IFI") +
-#   ggtitle("b) Groundwater Storage IFI") +
-#   theme_minimal(base_size = 10) + 
-#   theme(legend.position = "none") +
-#   theme(axis.text=element_blank()) +
-#   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
-# 
-# map4 <- ggplot(data = floodplain.df, aes(x = long, y = lat, group = group, fill = Sediment)) + 
-#   geom_polygon(data = CO.boundary_tidy, aes(x = long, y = lat, group = group), fill = "grey93") +
-#   geom_polygon() +
-#   coord_equal() +
-#   scale_fill_gradientn(colours = c("chocolate4", "wheat1" ,"darkcyan"), breaks = seq(0, 1, by = 0.1)) +
-#   labs(x = NULL, y = NULL, fill = "IFI") +
-#   ggtitle("c) Sediment Regulation IFI") +
-#   theme_minimal(base_size = 10) + 
-#   theme(legend.position = "none") +
-#   theme(axis.text=element_blank()) +
-#   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
-# 
-# map5 <- ggplot(data = floodplain.df, aes(x = long, y = lat, group = group, fill = Organics_S)) + 
-#   geom_polygon(data = CO.boundary_tidy, aes(x = long, y = lat, group = group), fill = "grey93") +
-#   geom_polygon() +
-#   coord_equal() +
-#   scale_fill_gradientn(colours = c("chocolate4", "wheat1" ,"darkcyan"), breaks = seq(0, 1, by = 0.1)) +
-#   labs(x = NULL, y = NULL, fill = "IFI") +
-#   ggtitle("d) Organics/Solutes Regulation IFI") +
-#   theme_minimal(base_size = 10) + 
-#   theme(legend.position = "none") +
-#   theme(axis.text=element_blank()) +
-#   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
-# 
-# map6 <- ggplot(data = floodplain.df, aes(x = long, y = lat, group = group, fill = Habitat)) + 
-#   geom_polygon(data = CO.boundary_tidy, aes(x = long, y = lat, group = group), fill = "grey93") +
-#   geom_polygon() +
-#   coord_equal() +
-#   scale_fill_gradientn(colours = c("chocolate4", "wheat1" ,"darkcyan"), breaks = seq(0, 1, by = 0.1)) +
-#   labs(x = NULL, y = NULL, fill = "IFI") +
-#   ggtitle("e) Habitat Provision IFI") +
-#   theme_minimal(base_size = 10) + 
-#   theme(legend.position = "none") +
-#   # theme(legend.text = element_text(size = 8)) +
-#   theme(axis.text=element_blank()) +
-#   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
-# 
-# grid.arrange(map2, map3, map4, map5, map6, nrow = 3)
-
 
 # Mapping zoomed in area IFI by function
 fp.df <- melt(floodplain.df, id = 1:9, measure = 10:15)
@@ -156,7 +90,7 @@ levels(fp.df$variable) = c("Flood Reduction", "Groundwater Storage", "Sediment R
 
 map7 <- ggplot(data = fp.df, aes(x = long, y = lat, group = group, fill = value)) + 
   # geom_polygon(data = CO.boundary_tidy, aes(x = long, y = lat, group = group), fill = "grey93") +
-  ggmap(get_map(location = bbox(CO.boundary), source = "osm", maptype = "toner", color = "bw")) +
+  # ggmap(get_map(location = bbox(CO.boundary), source = "osm", maptype = "toner", color = "bw", zoom = 1)) +
   geom_polygon() +
   # coord_equal() +
   coord_fixed(ratio = 1, xlim = xlimits, ylim = ylimits) +
