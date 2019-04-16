@@ -27,14 +27,15 @@ colnames(all.data)[which(names(all.data) == "IFI_geomea")] <- "IFI_geomean"
 
 col.names <- colnames(all.data)
 
-# Histograms of IFI results
-
 # find columns to plot
 functions <- c("Floods", "Groundwate", "Sediment", "Organics_S", "Habitat")
 func.IFI <- all.data[, functions]
 colnames(func.IFI) <- c("Floods", "Groundwater", "Sediment", "Organics_Solutes", "Habitat")
 
 # colnames(func.IFI)[which(names(func.IFI) == "IFI_geomean")] <- "Overall IFI"
+
+######################################
+# Histograms of IFI results
 
 p <- ggplot(gather(func.IFI), aes(value)) +
   geom_histogram(bins = 20) +
@@ -132,7 +133,7 @@ a1 <- ggplot(all.data, aes(x = FP_Areakm2, y = Floods)) +
     xlab("") +
     ylab("Floods IFI")
 
-a2 <- ggplot(all.data, aes(x = FP_Areakm2, y = Groundwater)) + 
+a2 <- ggplot(all.data, aes(x = FP_Areakm2, y = Groundwate)) + 
   geom_point() +
   scale_x_continuous() +
   scale_y_continuous() +
@@ -146,7 +147,7 @@ a3 <- ggplot(all.data, aes(x = FP_Areakm2, y = Sediment)) +
   xlab(bquote("Floodplain unit area," ~km^2)) +
   ylab("Sediment IFI")
 
-a4 <- ggplot(all.data, aes(x = FP_Areakm2, y = Organics_Solutes)) + 
+a4 <- ggplot(all.data, aes(x = FP_Areakm2, y = Organics_S)) + 
   geom_point() +
   scale_x_continuous() +
   scale_y_continuous() +
@@ -172,6 +173,7 @@ a6 <- ggplot(all.data, aes(x = FP_Areakm2, y = IFI_geomean)) +
   scale_y_continuous() +
   xlab(bquote("\nFloodplain unit area," ~km^2)) +
   ylab("Overall IFI\n") +
+  theme_bw() +
   theme(text = element_text(size=20))
 a6
 
@@ -192,7 +194,7 @@ SO <- ggplot(all.data, aes(StrmOrder, IFI_geomean, group = StrmOrder)) +
   ylab("Overall IFI\n") +
   theme_linedraw() +
   theme(text = element_text(size=24), panel.grid.major.x = element_blank(), panel.grid.major.y = element_blank(),
-        panel.grid.minor.y = element_blank(), plot.background = element_rect(fill = "#e9ecee")) +
+        panel.grid.minor.y = element_blank()) +
   geom_text(data = count.data, aes(StrmOrder, y = 1.0, label = Freq), nudge_y = 0.05, size = 5)
 SO
 
@@ -202,9 +204,9 @@ SO
 all.data$ECO_name <- as.factor(all.data$ECO_name)
 
 # get counts for label
-count.data <- as.data.frame((table(all.data$ECO_name)))
-names(count.data)[1] = 'ECO_name'
-count.data$Freq <- paste(" N =", as.character(count.data$Freq), sep = " ")
+count.data.ECO <- as.data.frame((table(all.data$ECO_name)))
+names(count.data.ECO)[1] = 'ECO_name'
+count.data.ECO$Freq <- paste(" N =", as.character(count.data.ECO$Freq), sep = " ")
 
 # Compute ANOVA
 eco.aov <- aov(IFI_geomean ~ ECO_name, data = all.data)
@@ -229,7 +231,7 @@ ECO <- ggplot(all.data, aes(ECO_name, IFI_geomean)) +
   ylab("Overall IFI\n") +
   theme(text = element_text(size=20), panel.grid.major.x = element_blank(),
         legend.position = "none") +
-  geom_text(data = count.data, aes(ECO_name, y = 1.0, label = Freq), nudge_y = 0.05, size = 5)
+  geom_text(data = count.data.ECO, aes(ECO_name, y = 1.0, label = Freq), nudge_y = 0.05, size = 5)
 ECO
 
 #############################
@@ -238,9 +240,9 @@ ECO
 all.data$In_City <- as.factor(all.data$In_City)
 
 # get counts for label
-count.data <- as.data.frame((table(all.data$In_City)))
-names(count.data)[1] = 'In_City'
-count.data$Freq <- paste(" N =", as.character(count.data$Freq), sep = " ")
+count.data.city <- as.data.frame((table(all.data$In_City)))
+names(count.data.city)[1] = 'In_City'
+count.data.city$Freq <- paste(" N =", as.character(count.data.city$Freq), sep = " ")
 
 # T test for difference
 t.test(IFI_geomean ~ In_City, data = all.data)
@@ -252,9 +254,8 @@ City.plot <- ggplot(all.data, aes(In_City, IFI_geomean)) +
   ylab("Overall IFI\n") +
   theme_linedraw() +
   theme(text = element_text(size=24), panel.grid.major.x = element_blank(), panel.grid.major.y = element_blank(),
-        panel.grid.minor.y = element_blank(), legend.position = "none",
-        plot.background = element_rect(fill = "#e9ecee")) +
-  geom_text(data = count.data, aes(In_City, y = 1.0, label = Freq), nudge_y = 0.05, size = 5)
+        panel.grid.minor.y = element_blank(), legend.position = "none") +
+  geom_text(data = count.data.city, aes(In_City, y = 1.0, label = Freq), nudge_y = 0.05, size = 5)
 City.plot
 
 
@@ -263,6 +264,8 @@ City.plot
 
 # read export from GIS
 ICI <- read.csv(paste(basepath, "/RawData/ICI_byHUC12.csv", sep=""))
+# read file intersected with the floodplain
+ICI.intersect <- read.csv(paste(basepath, "/RawData/ICI_byHUC12_FloodplainIntersect.csv", sep=""))
 
 IFI <- func.IFI
 IFI$Overall <- all.data$IFI_geomea
@@ -272,6 +275,16 @@ IFI$HUC12 <- all.data$HUC12
 ICI.comp <- merge(IFI, ICI, by.x = "HUC12", by.y = "IFI_HUC12", all.x = TRUE)
 names(ICI.comp)[names(ICI.comp)== 'MEAN_ICI_I'] <- "ICI"
 
+ICI.intersect.comp <- merge(IFI, ICI.intersect, by.x = "HUC12", by.y = "IFI_HUC12", all.x = TRUE)
+names(ICI.intersect.comp)[names(ICI.intersect.comp)== 'MEAN_ICI_I'] <- "ICI"
+
+# fit linear models
+ICI.lm <- lm(data = ICI.comp, Overall ~ ICI)
+R2.ICI <- summary(ICI.lm)$r.squared
+
+ICI.intersect.lm <- lm(data = ICI.intersect.comp, Overall ~ ICI)
+R2.ICI.intersect <- summary(ICI.intersect.lm)$r.squared
+
 # Scatter plot of ICI vs IFI
 ICI.plot <- ggplot(ICI.comp, aes(x = ICI, y = Overall)) + geom_point() +
   xlim(0,1) + ylim(0,1) +
@@ -280,16 +293,54 @@ ICI.plot <- ggplot(ICI.comp, aes(x = ICI, y = Overall)) + geom_point() +
   coord_equal() +
   xlab("Index of Catchment Integrity") +
   ylab("Overall Index of Floodplain Integrity") +
+  ggtitle("All Catchments") +
+  geom_text(x= 0.1, y=0.1, label = paste0("R^2 = ", round(R2.ICI,2))) +
   theme_bw()
-ICI.plot
 
-# fit linear model
-ICI.lm <- lm(data = ICI.comp, Overall ~ ICI)
-R2.ICI <- summary(ICI.lm)$r.squared
+# Scatter plot for catchments intersected with floodplains, ICI vs IFI
+ICI.intersect.plot <- ggplot(ICI.intersect.comp, aes(x = ICI, y = Overall)) + geom_point() +
+  xlim(0,1) + ylim(0,1) +
+  # scale_x_continuous(breaks = seq(0,1,0.25), labels = seq(0,1,0.25)) +
+  # scale_y_continuous(breaks = seq(0,1,0.25), labels = seq(0,1,0.25)) +
+  coord_equal() +
+  xlab("Index of Catchment Integrity") +
+  ylab("Overall Index of Floodplain Integrity") +
+  ggtitle("Catchments Intersected with Floodplain") +
+  geom_text(x= 0.1, y=0.1, label = paste0("R^2 = ", round(R2.ICI.intersect,2))) +
+  theme_bw()
+
+grid.arrange(ICI.plot, ICI.intersect.plot, ncol = 2)
+
 
 # Look at distribution of ICI values (very few over 0.8)
 # hist(ICI.comp$ICI, xlim = c(0,1))
 
+##########################################
+# Compare IFI to wetland abundance
+
+# read in wetland abundance by HUC-12 file
+wetlands <- read.csv(paste(basepath, "/RawData/Wetlands_table.csv", sep=""))
+wetlands <- wetlands[,c("HUC12", "Area_Density")]
+
+# Join Wetland abundance and IFI based on HUC12
+wetlands.comp <- merge(wetlands, IFI, by = "HUC12")
+
+# fit linear model
+wetlands.lm <- lm(data = wetlands.comp, Overall ~ Area_Density)
+R2.wetlands <- summary(wetlands.lm)$r.squared
+
+
+# Scatter plot of wetlands vs IFI
+wetlands.plot <- ggplot(wetlands.comp, aes(x = Area_Density, y = Overall)) + geom_point() +
+  xlim(0,1) + ylim(0,1) +
+  # scale_x_continuous(breaks = seq(0,1,0.25), labels = seq(0,1,0.25)) +
+  # scale_y_continuous(breaks = seq(0,1,0.25), labels = seq(0,1,0.25)) +
+  coord_equal() +
+  xlab("Density of Wetlands") +
+  ylab("Overall Index of Floodplain Integrity") +
+  geom_text(x= 0.9, y=0.1, label = paste0("R^2 = ", round(R2.wetlands,2))) +
+  theme_bw()
+wetlands.plot
 
 ################################
 # Sensitivity analysis of Function IFI results
@@ -314,6 +365,7 @@ func.plot <- ggplot(func.sensitivity, aes(min.func.name)) +
   geom_bar() +
   xlab("Function with Minimum IFI") +
   ylab("Number of Floodplain Units") +
+  theme(text = element_text(size=20)) +
   theme_bw()
 func.plot
 
@@ -321,8 +373,62 @@ sd.hist <- ggplot(func.sensitivity, aes(x = std.dev)) +
   geom_histogram(binwidth = 0.02) +
   xlab("Standard deviation of Function IFI") +
   ylab("Number of Floodplain Units") +
+  theme(text = element_text(size=20)) +
   theme_bw()
 sd.hist
 
-# output result as csv
+# Investigate by stream order
+func.sensitivity$StrmOrder <- all.data$StrmOrder
+
+# plot Std dev and C.V. of function IFI by stream order
+sd.SO <- ggplot(func.sensitivity, aes(StrmOrder, std.dev, group = StrmOrder)) +
+  geom_boxplot(na.rm = TRUE) +
+  scale_x_discrete(name = "Stream Order", breaks = seq(1:8)) + 
+  ylab("Standard Deviation of Function IFI\n") +
+  theme_linedraw() +
+  theme(text = element_text(size=20), panel.grid.major.x = element_blank(), panel.grid.major.y = element_blank(),
+        panel.grid.minor.y = element_blank()) +
+  geom_text(data = count.data, aes(StrmOrder, y = max(func.sensitivity$std.dev), label = Freq), 
+            nudge_y = 0.05, size = 5)
+sd.SO
+
+cv.SO <- ggplot(func.sensitivity, aes(StrmOrder, CV, group = StrmOrder)) +
+  geom_boxplot(na.rm = TRUE) +
+  scale_x_discrete(name = "Stream Order", breaks = seq(1:8)) + 
+  ylab("Coefficient of Variation of Function IFI\n") +
+  theme_linedraw() +
+  theme(text = element_text(size=20), panel.grid.major.x = element_blank(), panel.grid.major.y = element_blank(),
+        panel.grid.minor.y = element_blank()) +
+  geom_text(data = count.data, aes(StrmOrder, y = 2.02, label = Freq), size = 5)
+cv.SO
+
+# Plot minimum function by stream order
+min.func.SO <- func.sensitivity %>%
+  count(min.func.name, StrmOrder) %>%
+  group_by(StrmOrder) %>%
+  mutate(percent = n/sum(n))
+
+# plot by percent
+min.func.plot <- ggplot(min.func.SO, aes(x= StrmOrder, y = percent, fill = min.func.name)) +
+  geom_col(position = "fill") +
+  scale_y_continuous(labels = percent) +
+  scale_fill_brewer(palette = "Set1") +
+  xlab("Stream Order") +
+  theme(text = element_text(size=16)) +
+  labs(fill = "Minimum Function")
+min.func.plot
+
+min.func.plot2 <- ggplot(min.func.SO, aes(x= StrmOrder, y = n, fill = min.func.name)) +
+  geom_col() +
+  scale_y_continuous(name = "Count of Floodplain Units") +
+  scale_fill_brewer(palette = "Set1") +
+  xlab("Stream Order") +
+  theme(text = element_text(size=16)) +
+  labs(fill = "Minimum Function")
+min.func.plot2
+
+# output sensitivity result as csv
 write.csv(func.sensitivity, file = paste(out.path, "/IFI_sensitivity.csv", sep=""))
+
+
+
