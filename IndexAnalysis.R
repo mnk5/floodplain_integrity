@@ -96,9 +96,9 @@ Overall.sum <- by.area %>%
 # THIS IS ALL MANUAL AND WILL NEED TO CHANGE IF DATA CHANGES
 area.sum <- data.frame(breaks = OS.sum$Organics_Solutes)
 area.sum$Floods <- NA
-area.sum[7:20,2] <- Flood.sum$area
+area.sum[4:20,2] <- Flood.sum$area
 area.sum$Groundwater <- NA
-area.sum[2:20,3] <- GW.sum$area
+area.sum[6:20,3] <- GW.sum$area
 area.sum$Sediment <- NA
 area.sum[2:20,4] <- Sed.sum$area
 area.sum$Organics_Solutes <- OS.sum$area
@@ -323,7 +323,7 @@ wetlands <- read.csv(paste(basepath, "/RawData/Wetlands_table.csv", sep=""))
 wetlands <- wetlands[,c("HUC12", "Area_Density")]
 
 IFI$StrmOrder <- all.data$StrmOrder
-IFI$strmOrder <- as.factor(IFI$strmOrder)
+IFI$StrmOrder <- as.factor(IFI$StrmOrder)
 
 # Join Wetland abundance and IFI based on HUC12
 wetlands.comp <- merge(wetlands, IFI, by = "HUC12")

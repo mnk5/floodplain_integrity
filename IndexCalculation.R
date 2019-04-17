@@ -68,9 +68,9 @@ stressors.neg <- 1-stressors
 # choose datasets by function
 
 # Flood reduction
-FR.stressors <- c("Buildings", "Roads_Rail", "ForestLoss", "Developed", "Wells", "LeveedArea")
+FR.stressors <- c("Buildings", "Roads_Rail", "ForestLoss", "Developed", "LeveedArea")
 # Groundwater regulation
-GW.stressors <- c("Impervious", "Ditches", "Agriculture", "ForestLoss")
+GW.stressors <- c("Impervious", "Ditches", "Agriculture", "ForestLoss", "Wells")
 # Sediment Flux
 SF.stressors <- c("MH20", "Agriculture", "Roads_Rail", "ForestLoss")
 # Organics and Solute regulation
