@@ -322,6 +322,9 @@ grid.arrange(ICI.plot, ICI.intersect.plot, ncol = 2)
 wetlands <- read.csv(paste(basepath, "/RawData/Wetlands_table.csv", sep=""))
 wetlands <- wetlands[,c("HUC12", "Area_Density")]
 
+IFI$StrmOrder <- all.data$StrmOrder
+IFI$strmOrder <- as.factor(IFI$strmOrder)
+
 # Join Wetland abundance and IFI based on HUC12
 wetlands.comp <- merge(wetlands, IFI, by = "HUC12")
 
@@ -329,16 +332,24 @@ wetlands.comp <- merge(wetlands, IFI, by = "HUC12")
 wetlands.lm <- lm(data = wetlands.comp, Overall ~ Area_Density)
 R2.wetlands <- summary(wetlands.lm)$r.squared
 
+# lm by stream order
+
+wetlands.lm.order <- by(wetlands.comp, wetlands.comp$StrmOrder, 
+                        function(x) lm(data = x, Overall ~ Area_Density))
+R2.wetlands.order <- lapply(wetlands.lm.order, function(x) summary(x)$r.squared)
+
 
 # Scatter plot of wetlands vs IFI
-wetlands.plot <- ggplot(wetlands.comp, aes(x = Area_Density, y = Overall)) + geom_point() +
+wetlands.plot <- ggplot(wetlands.comp, aes(x = Area_Density, y = Overall)) + 
+  geom_point() +
   xlim(0,1) + ylim(0,1) +
+  facet_wrap(~ StrmOrder, ncol = 3) +
   # scale_x_continuous(breaks = seq(0,1,0.25), labels = seq(0,1,0.25)) +
   # scale_y_continuous(breaks = seq(0,1,0.25), labels = seq(0,1,0.25)) +
   coord_equal() +
   xlab("Density of Wetlands") +
   ylab("Overall Index of Floodplain Integrity") +
-  geom_text(x= 0.9, y=0.1, label = paste0("R^2 = ", round(R2.wetlands,2))) +
+  # geom_text(x= 0.9, y=0.1, label = paste0("R^2 = ", round(R2.wetlands,2))) +
   theme_bw()
 wetlands.plot
 
