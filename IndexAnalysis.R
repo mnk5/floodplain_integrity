@@ -476,7 +476,29 @@ write.csv(func.sensitivity, file = paste(out.path, "/IFI_sensitivity.csv", sep="
 ############################
 # IFI function to overall ratio
 
+func.ratio <- apply(func.IFI, 2, function(x) x/all.data$IFI_geomean)
 
+# Plot boxplots
+ratio.df <- melt(func.ratio)
+levels(ratio.df$Var2) = c("Flood Reduction", "Groundwater Storage", "Sediment Regulation",
+                             "Organics/Solutes Regulation", "Habitat Provision")
 
+ratio.plot <- ggplot(ratio.df, aes(x = Var2, y = value)) +
+  geom_boxplot() +
+  geom_hline(yintercept = 1, linetype = "dashed", size = 1) +
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 10)) +
+  labs( y = "Ratio of Function to Overall IFI\n", x = NULL) +
+  theme_linedraw() +
+  theme(text = element_text(size=20), panel.grid.major.x = element_blank(), panel.grid.major.y = element_blank(),
+        panel.grid.minor.y = element_blank(), legend.position = "none")
+ratio.plot
 
+# Test for significant differences 
 
+# clean INF and remove
+ratio.df <- ratio.df[!is.infinite(ratio.df$value),]
+ratio.lm <- lm(value ~ Var2, data = ratio.df)
+ratio.pairwise <- lsmeans(ratio.lm, pairwise ~ Var2)
+method.contrasts <- ratio.pairwise$contrasts
+method.contrasts
+# results: all significantly different except sediment and organics
