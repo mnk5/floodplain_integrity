@@ -14,6 +14,7 @@ library(emmeans)
 library(scales)
 library(dplyr)
 library(data.table)
+library(stringr)
 
 
 # set path to Git folder
@@ -258,6 +259,37 @@ City.plot <- ggplot(all.data, aes(In_City, IFI_geomean)) +
   geom_text(data = count.data.city, aes(In_City, y = 1.0, label = Freq), nudge_y = 0.05, size = 5)
 City.plot
 
+##############################
+# IFI by Physiographic region
+
+# Convert to factor and re-order to match geography
+all.data$PhysioReg <- factor(all.data$PhysioReg,
+                                levels = c("Intermontane Plateaus", "Rocky Mountain System", "Interior Plains"),
+                                ordered = TRUE)
+
+# get counts for label
+count.data.phys <- as.data.frame((table(all.data$PhysioReg)))
+names(count.data.phys)[1] = 'PhysioReg'
+count.data.phys$Freq <- paste(" N =", as.character(count.data.phys$Freq), sep = " ")
+
+# Test for differences 
+phys.lm <- lm(IFI_geomean ~ PhysioReg, data = all.data)
+phys.pairwise <- lsmeans(phys.lm, pairwise ~ PhysioReg)
+method.contrasts <- phys.pairwise$contrasts
+method.contrasts
+# results: Interior plains different from both Rocky mtn and Plateaus
+
+#Plot boxplots
+PHYS <- ggplot(all.data, aes(PhysioReg, IFI_geomean)) +
+  geom_boxplot(aes(PhysioReg, IFI_geomean)) +
+  scale_x_discrete(name = "Physiographic Region", labels = function(x) str_wrap(x, width = 20)) + 
+  ylab("Overall IFI\n") +
+  theme_linedraw() +
+  theme(text = element_text(size=24), panel.grid.major.x = element_blank(), panel.grid.major.y = element_blank(),
+        panel.grid.minor.y = element_blank(), legend.position = "none") +
+  geom_text(data = count.data.phys, aes(PhysioReg, y = 1.0, label = Freq), nudge_y = 0.05, size = 5)
+PHYS
+
 
 ##############################
 # IFI vs ICI comparison
@@ -440,6 +472,11 @@ min.func.plot2
 
 # output sensitivity result as csv
 write.csv(func.sensitivity, file = paste(out.path, "/IFI_sensitivity.csv", sep=""))
+
+############################
+# IFI function to overall ratio
+
+
 
 
 
