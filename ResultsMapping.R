@@ -45,9 +45,9 @@ CO.rivers_tidy <- tidy(CO.rivers, region = 'id')
 # Plot results
 
 # choose bounding box area for zoomed in area
-zoomsize <- 60000
-xlimits <- c(480000,480000 + zoomsize)
-ylimits <- c(4520000, 4520000 - zoomsize)
+zoomsize <- 46000
+xlimits <- c(494000,494000 + zoomsize)
+ylimits <- c(4506000, 4506000 - zoomsize)
 
 # Floodplains in state
 map <- ggplot(data = floodplain.df, aes(x = long, y = lat, group = group)) + 
@@ -82,7 +82,7 @@ map1
 # # All IFI by function
 
 # Mapping zoomed in area IFI by function
-fp.df <- melt(floodplain.df, id = 1:9, measure = 10:15)
+fp.df <- melt(floodplain.df, id = 1:9, measure = 13:18)
 levels(fp.df$variable) = c("Flood Reduction", "Groundwater Storage", "Sediment Regulation",
                            "Organics/Solutes Regulation", "Habitat Provision", "Overall IFI")
 
@@ -98,7 +98,7 @@ map7 <- ggplot(data = fp.df, aes(x = long, y = lat, group = group, fill = value)
   scale_fill_gradientn(colours = c("chocolate4", "wheat1" ,"darkcyan"), breaks = seq(0, 1, by = 0.2)) +
   labs(x = NULL, y = NULL, fill = "IFI") +
   theme_minimal(base_size = 12) + 
-  theme(#panel.background = element_rect(fill = "grey93"),
+  theme(panel.background = element_rect(fill = "grey93"),
         panel.border = element_rect(fill = NA, colour = "black"),
         legend.position = "bottom",
         legend.text = element_text(size = 8),
