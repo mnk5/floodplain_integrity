@@ -102,6 +102,33 @@ map2 <- ggplot(data = HUC12.df, aes(x = long, y = lat, group = group)) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 
 map2
+
+
+###################################
+# Map minimum function to HUC-12
+
+# put functions in order
+HUC12.df$MinFunc <- factor(HUC12.df$MinFunc,
+       levels = c("Floods", "Groundwater", "Sediment", "Organics/Solutes", "Habitat"),
+       ordered = TRUE)
+
+min.map <- ggplot(data = HUC12.df, aes(x = long, y = lat, group = group)) + 
+  geom_polygon(data = HUC12.df, color = "grey27", size = 0.1, aes(x = long, y = lat, group = group, fill = MinFunc)) +
+  geom_polygon(data = CO.boundary_tidy, aes(x = long, y = lat, group = group), 
+               fill = NA, color = "black", size = 1.5) +
+  geom_path(data = CO.rivers_tidy, aes(x = long, y = lat, group = group), color = "navy", size = 1) +
+  coord_equal() +
+  scale_fill_brewer(palette = "Set3") +
+  # coord_fixed(ratio = 1, xlim = xlimits, ylim = ylimits) +
+  labs(x = NULL, y = NULL, fill = "Minimum Function") +
+  theme_minimal(base_size = 12) + 
+  theme(legend.text = element_text(size = 12)) +
+  theme(axis.text=element_blank()) +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+
+min.map
+
+###################################
 # # All IFI by function
 
 # Mapping zoomed in area IFI by function
@@ -109,7 +136,6 @@ fp.df <- melt(floodplain.df, id = 1:9, measure = 13:18)
 levels(fp.df$variable) = c("Flood Reduction", "Groundwater Storage", "Sediment Regulation",
                            "Organics/Solutes Regulation", "Habitat Provision", "Overall IFI")
 
-# change projection to WGS84
 
 
 map7 <- ggplot(data = fp.df, aes(x = long, y = lat, group = group, fill = value)) + 
