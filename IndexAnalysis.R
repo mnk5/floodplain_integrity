@@ -199,6 +199,14 @@ SO <- ggplot(all.data, aes(StrmOrder, IFI_geomean, group = StrmOrder)) +
   geom_text(data = count.data, aes(StrmOrder, y = 1.0, label = Freq), nudge_y = 0.05, size = 5)
 SO
 
+# Test for significant difference
+all.data$StrmOrder <- as.factor(all.data$StrmOrder)
+SO.lm <- lm(IFI_geomean ~ StrmOrder, data = all.data)
+SO.pairwise <- lsmeans(SO.lm, pairwise ~ StrmOrder)
+method.contrasts <- SO.pairwise$contrasts
+method.contrasts
+# Results - 1-3 not sig different, 4-6 all sig different fromnext larger, 6-7 not sig different, 8 is weird. 
+
 ############################
 # IFI by ecoregion
 
@@ -289,6 +297,16 @@ PHYS <- ggplot(all.data, aes(PhysioReg, IFI_geomean)) +
         panel.grid.minor.y = element_blank(), legend.position = "none") +
   geom_text(data = count.data.phys, aes(PhysioReg, y = 1.0, label = Freq), nudge_y = 0.05, size = 5)
 PHYS
+
+# Stream Order by physiographic region
+phys.so <- ggplot(na.omit(all.data), aes(StrmOrder)) +
+  geom_bar() +
+  facet_wrap(~ PhysioReg) +
+  xlab("Stream Order") +
+  ylab("Number of Floodplain Units") +
+  theme_bw() +
+  theme(text = element_text(size = 16))
+phys.so 
 
 
 ##############################
