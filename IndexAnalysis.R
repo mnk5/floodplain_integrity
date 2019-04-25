@@ -9,12 +9,14 @@
 library(ggplot2)
 library(RColorBrewer)
 library(tidyr)
+library(grid)
 library(gridExtra)
 library(emmeans)
 library(scales)
 library(dplyr)
 library(data.table)
 library(stringr)
+library(psych)
 
 
 # set path to Git folder
@@ -34,6 +36,14 @@ func.IFI <- all.data[, functions]
 colnames(func.IFI) <- c("Floods", "Groundwater", "Sediment", "Organics_Solutes", "Habitat")
 
 # colnames(func.IFI)[which(names(func.IFI) == "IFI_geomean")] <- "Overall IFI"
+
+######################################
+# general statistics about overall IFI
+IFI.stats <- describe(all.data$IFI_geomean)
+IFI.stats
+
+IFI.func.stats <- apply(func.IFI, 2, function(x) describe(x))
+IFI.func.stats
 
 ######################################
 # Histograms of IFI results
@@ -192,11 +202,12 @@ count.data$Freq <- paste(" N =", as.character(count.data$Freq), sep = " ")
 SO <- ggplot(all.data, aes(StrmOrder, IFI_geomean, group = StrmOrder)) +
   geom_boxplot(na.rm = TRUE) +
   scale_x_discrete(name = "Stream Order", breaks = seq(1:8)) + 
-  ylab("Overall IFI\n") +
+  ylab("Overall IFI") +
   theme_linedraw() +
-  theme(text = element_text(size=24), panel.grid.major.x = element_blank(), panel.grid.major.y = element_blank(),
+  theme(text = element_text(size=16), panel.grid.major.x = element_blank(), panel.grid.major.y = element_blank(),
         panel.grid.minor.y = element_blank()) +
-  geom_text(data = count.data, aes(StrmOrder, y = 1.0, label = Freq), nudge_y = 0.05, size = 5)
+  geom_text(data = count.data, aes(StrmOrder, y = 1.0, label = Freq), nudge_y = 0.05, size = 4) +
+  labs(tag = "c)")
 SO
 
 # Test for significant difference
@@ -259,12 +270,13 @@ t.test(IFI_geomean ~ In_City, data = all.data)
 
 City.plot <- ggplot(all.data, aes(In_City, IFI_geomean)) +
   geom_boxplot(aes(In_City, IFI_geomean)) +
-  scale_x_discrete(name = "", labels = c("Rural", "City")) + 
-  ylab("Overall IFI\n") +
+  scale_x_discrete(name = "", labels = c("Rural", "Urban")) + 
+  ylab("Overall IFI") +
   theme_linedraw() +
-  theme(text = element_text(size=24), panel.grid.major.x = element_blank(), panel.grid.major.y = element_blank(),
+  theme(text = element_text(size=16), panel.grid.major.x = element_blank(), panel.grid.major.y = element_blank(),
         panel.grid.minor.y = element_blank(), legend.position = "none") +
-  geom_text(data = count.data.city, aes(In_City, y = 1.0, label = Freq), nudge_y = 0.05, size = 5)
+  geom_text(data = count.data.city, aes(In_City, y = 1.0, label = Freq), nudge_y = 0.05, size = 4) +
+  labs(tag = "b)")
 City.plot
 
 ##############################
@@ -290,12 +302,13 @@ method.contrasts
 #Plot boxplots
 PHYS <- ggplot(all.data, aes(PhysioReg, IFI_geomean)) +
   geom_boxplot(aes(PhysioReg, IFI_geomean)) +
-  scale_x_discrete(name = "Physiographic Region", labels = function(x) str_wrap(x, width = 20)) + 
-  ylab("Overall IFI\n") +
+  scale_x_discrete(name = NULL, labels = function(x) str_wrap(x, width = 20)) + 
+  ylab("Overall IFI") +
   theme_linedraw() +
-  theme(text = element_text(size=24), panel.grid.major.x = element_blank(), panel.grid.major.y = element_blank(),
+  theme(text = element_text(size=16), panel.grid.major.x = element_blank(), panel.grid.major.y = element_blank(),
         panel.grid.minor.y = element_blank(), legend.position = "none") +
-  geom_text(data = count.data.phys, aes(PhysioReg, y = 1.0, label = Freq), nudge_y = 0.05, size = 5)
+  geom_text(data = count.data.phys, aes(PhysioReg, y = 1.0, label = Freq), nudge_y = 0.05, size = 4) +
+  labs(tag = "a)")
 PHYS
 
 # Stream Order by physiographic region
@@ -308,6 +321,12 @@ phys.so <- ggplot(na.omit(all.data), aes(StrmOrder)) +
   theme(text = element_text(size = 16))
 phys.so 
 
+##############################
+# Combine boxplots to make figure
+
+# divide grid arrange by 5
+Figure <- grid.arrange(PHYS, City.plot, SO,
+                       layout_matrix = rbind(c(1,1,1,2,2), c(3,3,3,3,3)))
 
 ##############################
 # IFI vs ICI comparison

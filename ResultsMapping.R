@@ -8,6 +8,7 @@
 
 library(ggplot2)
 library(RColorBrewer)
+library(wesanderson)
 library(rgeos)
 library(rgdal)
 library(dplyr)
@@ -118,7 +119,7 @@ min.map <- ggplot(data = HUC12.df, aes(x = long, y = lat, group = group)) +
                fill = NA, color = "black", size = 1.5) +
   geom_path(data = CO.rivers_tidy, aes(x = long, y = lat, group = group), color = "navy", size = 1) +
   coord_equal() +
-  scale_fill_brewer(palette = "Set3") +
+  scale_fill_manual(values = wes_palette(n=5, name = "Darjeeling1")) +
   # coord_fixed(ratio = 1, xlim = xlimits, ylim = ylimits) +
   labs(x = NULL, y = NULL, fill = "Minimum Function") +
   theme_minimal(base_size = 12) + 
