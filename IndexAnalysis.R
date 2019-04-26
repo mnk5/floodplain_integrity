@@ -182,8 +182,8 @@ a6 <- ggplot(all.data, aes(x = FP_Areakm2, y = IFI_geomean)) +
   geom_point() +
   scale_x_log10(labels = trans_format('log10',math_format(10^.x))) +
   scale_y_continuous() +
-  xlab(bquote("\nFloodplain unit area," ~km^2)) +
-  ylab("Overall IFI\n") +
+  xlab(bquote("Floodplain unit area," ~km^2)) +
+  ylab("Overall IFI") +
   theme_bw() +
   theme(text = element_text(size=20))
 a6
@@ -367,16 +367,19 @@ ICI.plot <- ggplot(ICI.comp, aes(x = ICI, y = Overall)) + geom_point() +
   theme_bw()
 
 # Scatter plot for catchments intersected with floodplains, ICI vs IFI
-ICI.intersect.plot <- ggplot(ICI.intersect.comp, aes(x = ICI, y = Overall)) + geom_point() +
+ICI.intersect.plot <- ggplot(ICI.intersect.comp, aes(x = ICI, y = Overall)) + 
+  geom_point(size = 1) +
   xlim(0,1) + ylim(0,1) +
   # scale_x_continuous(breaks = seq(0,1,0.25), labels = seq(0,1,0.25)) +
   # scale_y_continuous(breaks = seq(0,1,0.25), labels = seq(0,1,0.25)) +
   coord_equal() +
   xlab("Index of Catchment Integrity") +
   ylab("Overall Index of Floodplain Integrity") +
-  ggtitle("Catchments Intersected with Floodplain") +
-  geom_text(x= 0.1, y=0.1, label = paste0("R^2 = ", round(R2.ICI.intersect,2))) +
-  theme_bw()
+  # ggtitle("Catchments Intersected with Floodplain") +
+  # geom_text(x= 0.1, y=0.1, label = paste0("R^2 = ", round(R2.ICI.intersect,2))) +
+  theme_bw() +
+  theme(text = element_text(size=16)) +
+  labs(tag = "a)")
 
 grid.arrange(ICI.plot, ICI.intersect.plot, ncol = 2)
 
@@ -410,17 +413,21 @@ R2.wetlands.order <- lapply(wetlands.lm.order, function(x) summary(x)$r.squared)
 
 # Scatter plot of wetlands vs IFI
 wetlands.plot <- ggplot(wetlands.comp, aes(x = Area_Density, y = Overall)) + 
-  geom_point() +
+  geom_point(size = 1) +
   xlim(0,1) + ylim(0,1) +
-  facet_wrap(~ StrmOrder, ncol = 3) +
+  # facet_wrap(~ StrmOrder, ncol = 3) +
   # scale_x_continuous(breaks = seq(0,1,0.25), labels = seq(0,1,0.25)) +
   # scale_y_continuous(breaks = seq(0,1,0.25), labels = seq(0,1,0.25)) +
   coord_equal() +
   xlab("Density of Wetlands") +
   ylab("Overall Index of Floodplain Integrity") +
   # geom_text(x= 0.9, y=0.1, label = paste0("R^2 = ", round(R2.wetlands,2))) +
-  theme_bw()
+  theme_bw() +
+  theme(text = element_text(size=16)) +
+  labs(tag = "b)")
 wetlands.plot
+
+grid.arrange(ICI.intersect.plot, wetlands.plot, ncol = 2)
 
 ################################
 # Sensitivity analysis of Function IFI results
@@ -526,7 +533,7 @@ ratio.plot <- ggplot(ratio.df, aes(x = Var2, y = value)) +
   scale_x_discrete(labels = function(x) str_wrap(x, width = 10)) +
   labs( y = "Ratio of Function to Overall IFI\n", x = NULL) +
   theme_linedraw() +
-  theme(text = element_text(size=20), panel.grid.major.x = element_blank(), panel.grid.major.y = element_blank(),
+  theme(text = element_text(size=16), panel.grid.major.x = element_blank(), panel.grid.major.y = element_blank(),
         panel.grid.minor.y = element_blank(), legend.position = "none")
 ratio.plot
 
