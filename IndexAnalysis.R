@@ -17,6 +17,7 @@ library(dplyr)
 library(data.table)
 library(stringr)
 library(psych)
+library(ggpubr)
 
 
 # set path to Git folder
@@ -125,13 +126,15 @@ area.df <- melt(area.sum, id = 1, measure = 2:7)
 levels(area.df$variable) = c("Flood Reduction", "Groundwater Storage", "Sediment Regulation",
                           "Organics/Solutes Regulation", "Habitat Provision", "Overall IFI")
 
-area.barplot <- ggplot(data = area.df, aes(x = breaks, y = value)) +
-  geom_bar(stat = "identity", width = 1,  position = position_nudge(x = -0.5)) +
-  scale_x_continuous(limits = c(0, 20), breaks = seq(0, 20, 2), 
-                     labels = c("0", "0.1", "0.2", "0.3", "0.4", "0.5", "0.6", "0.7","0.8", "0.9", "1.0")) +
-  facet_wrap(~ variable, ncol = 2) +
+area.barplot <- ggplot(data = na.omit(area.df), aes(x = breaks, y = value)) +
+  geom_bar(stat = "identity", width = 1,  position = position_nudge(x = -0.5), fill = "grey27") +
+  scale_x_continuous(limits = c(0, 20), breaks = seq(0, 20, 4), 
+                     labels = c("0", "0.2", "0.4", "0.6", "0.8", "1.0")) +
+                     # labels = c("0", "0.1", "0.2", "0.3", "0.4", "0.5", "0.6", "0.7","0.8", "0.9", "1.0")) +
+  facet_wrap(~ variable, ncol = 3) +
   labs(x = "IFI Value", y = bquote("Total floodplain area, " ~km^2)) +
-  theme_minimal(base_size = 12)
+  theme_bw(base_size = 16) +
+  theme(strip.background =element_rect(fill="grey93"))
 area.barplot
 
 
@@ -197,9 +200,9 @@ count.data <- as.data.frame((table(all.data$StrmOrder)))
 names(count.data)[1] = 'StrmOrder'
 count.data$Freq <- paste(" N =", as.character(count.data$Freq), sep = " ")
 
+SO_comparisons <- list( c("1","2"), c("2","3"), c("3", "4"), c("4","5"), c("5","6"), c("6", "7"))
 
-
-SO <- ggplot(all.data, aes(StrmOrder, IFI_geomean, group = StrmOrder)) +
+SO <- ggplot(na.omit(all.data), aes(StrmOrder, IFI_geomean, group = StrmOrder)) +
   geom_boxplot(na.rm = TRUE) +
   scale_x_discrete(name = "Stream Order", breaks = seq(1:8)) + 
   ylab("Overall IFI") +
@@ -207,7 +210,10 @@ SO <- ggplot(all.data, aes(StrmOrder, IFI_geomean, group = StrmOrder)) +
   theme(text = element_text(size=16), panel.grid.major.x = element_blank(), panel.grid.major.y = element_blank(),
         panel.grid.minor.y = element_blank()) +
   geom_text(data = count.data, aes(StrmOrder, y = 1.0, label = Freq), nudge_y = 0.05, size = 4) +
-  labs(tag = "c)")
+  labs(tag = "c)") +
+  stat_compare_means(comparisons = SO_comparisons, label = "p.signif", method = "t.test", 
+                     label.y = seq(1.2, 1.4, 0.2/length(my_comparisons)))
+  
 SO
 
 # Test for significant difference
@@ -299,6 +305,10 @@ method.contrasts <- phys.pairwise$contrasts
 method.contrasts
 # results: Interior plains different from both Rocky mtn and Plateaus
 
+Phys_comparisons <- list(c("Intermontane Plateaus", "Rocky Mountain System"), 
+                         c("Rocky Mountain System", "Interior Plains"),
+                         c("Intermontane Plateaus", "Interior Plains"))
+
 #Plot boxplots
 PHYS <- ggplot(all.data, aes(PhysioReg, IFI_geomean)) +
   geom_boxplot(aes(PhysioReg, IFI_geomean)) +
@@ -308,7 +318,9 @@ PHYS <- ggplot(all.data, aes(PhysioReg, IFI_geomean)) +
   theme(text = element_text(size=16), panel.grid.major.x = element_blank(), panel.grid.major.y = element_blank(),
         panel.grid.minor.y = element_blank(), legend.position = "none") +
   geom_text(data = count.data.phys, aes(PhysioReg, y = 1.0, label = Freq), nudge_y = 0.05, size = 4) +
-  labs(tag = "a)")
+  labs(tag = "a)") +
+  stat_compare_means(comparisons = Phys_comparisons, label = "p.signif", 
+                     label.y = c(1.2, 1.3, 1.4))
 PHYS
 
 # Stream Order by physiographic region

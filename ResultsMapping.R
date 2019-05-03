@@ -76,7 +76,7 @@ map1 <- ggplot(data = floodplain.df, aes(x = long, y = lat, group = group, fill 
   geom_polygon(data = floodplain.df, aes(x = long, y = lat, group = group, fill = IFI_geomea)) +
   coord_equal() +
   # coord_fixed(ratio = 1, xlim = xlimits, ylim = ylimits) +
-  scale_fill_gradientn(colours = c("chocolate4", "wheat1" ,"darkcyan"), breaks = seq(0, 1, by = 0.2))
+  scale_fill_gradientn(colours = c("chocolate3", "wheat1" ,"darkcyan"), breaks = seq(0, 1, by = 0.2))
 map1 <- map1 + labs(x = NULL, y = NULL, fill = "IFI")
 map1 <- map1 + theme_minimal(base_size = 14) + 
   theme(legend.text = element_text(size = 14)) +
@@ -94,7 +94,7 @@ map2 <- ggplot(data = HUC12.df, aes(x = long, y = lat, group = group)) +
   geom_path(data = CO.rivers_tidy, aes(x = long, y = lat, group = group), color = "navy", size = 1) +
   coord_equal() +
   # coord_fixed(ratio = 1, xlim = xlimits, ylim = ylimits) +
-  scale_fill_gradientn(colours = c("chocolate4", "wheat1" ,"darkcyan"), breaks = seq(0, 1.0, by = 0.2), 
+  scale_fill_gradientn(colours = c("chocolate3", "wheat1" ,"darkcyan"), breaks = seq(0, 1.0, by = 0.2), 
                        labels = c("0.0","0.2", "0.4", "0.6", "0.8", "1.0"), limits = c(0,1)) +
   labs(x = NULL, y = NULL, fill = "IFI") +
   theme_minimal(base_size = 12) + 
@@ -146,14 +146,14 @@ map7 <- ggplot(data = fp.df, aes(x = long, y = lat, group = group, fill = value)
   # coord_equal() +
   coord_fixed(ratio = 1, xlim = xlimits, ylim = ylimits) +
   facet_wrap(~ variable, ncol = 3) +
-  scale_fill_gradientn(colours = c("chocolate4", "wheat1" ,"darkcyan"), breaks = seq(0, 1, by = 0.2)) +
+  scale_fill_gradientn(colours = c("chocolate3", "wheat1" ,"darkcyan"), breaks = seq(0, 1, by = 0.2)) +
   labs(x = NULL, y = NULL, fill = "IFI") +
   theme_minimal(base_size = 16) + 
   theme(panel.background = element_rect(fill = "grey93"),
         panel.border = element_rect(fill = NA, colour = "black"),
         legend.position = "bottom",
         legend.text = element_text(size = 12),
-        legend.key.width = unit(1, "cm"))
-        # axis.text=element_blank(),
-        # panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+        legend.key.width = unit(1, "cm"),
+        axis.text=element_blank(),
+        panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 map7
