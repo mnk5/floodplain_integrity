@@ -24,7 +24,7 @@ names <- c("pnMH20", "pnFH1", "pnFH6", "pnFH7", "pnDH1", "pnDH2","pnDH3","pnDH4"
 HydAlt <- list()
 for (n in 6:15){
   data <- df[,c(n, n+12, n+23, n+34, n+48)]
-  colnames(data) <- c("Max","Mean","LengthWeight","OrderWeight","MaxOrderMean")
+  colnames(data) <- c("Max","Mean","LengthWeight","OrderWeight","MaxOrdMean")
   # set -999 values from GIS to NA 
   data[data == -999] <- NA
   
@@ -34,7 +34,7 @@ for (n in 6:15){
 }
 
 
-## Create boxlpots of 4 methods for each of 10 Hyd Alt metrics
+## Create boxlpots of 5 methods for each of 10 Hyd Alt metrics
 par(mar=c(2.1,4.1,2.1,2.1),mfrow = c(5,2))
 for (i in 1:length(HydAlt)){
   boxplot(HydAlt[[i]], 
@@ -83,7 +83,7 @@ for (i in 1:10){
   boxplot(meandata[,i] ~ StrmOrder, data = meandata, 
                                xlab ='Stream Order', 
                                ylab = 'Hydologic Alteration',
-                               main = sprintf('Mean %s by FP Segment', metric))
+                               main = sprintf('Mean %s by FP Unit', metric))
 }
 
 #############################################

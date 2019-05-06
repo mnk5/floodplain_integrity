@@ -8,6 +8,7 @@
 
 library(ggplot2)
 library(RColorBrewer)
+library(wesanderson)
 library(tidyr)
 library(grid)
 library(gridExtra)
@@ -141,38 +142,43 @@ area.barplot
 # Plot by floodplain area
 a1 <- ggplot(all.data, aes(x = FP_Areakm2, y = Floods)) + 
     geom_point() +
-    scale_x_continuous() +
+    scale_x_log10(labels = trans_format('log10',math_format(10^.x))) +
     scale_y_continuous() +
     xlab("") +
-    ylab("Floods IFI")
+    ylab("Floods IFI") +
+    theme_bw()
 
 a2 <- ggplot(all.data, aes(x = FP_Areakm2, y = Groundwate)) + 
   geom_point() +
-  scale_x_continuous() +
+  scale_x_log10(labels = trans_format('log10',math_format(10^.x))) +
   scale_y_continuous() +
   xlab("") +
-  ylab("Groundwater IFI")
+  ylab("Groundwater IFI") +
+  theme_bw()
 
 a3 <- ggplot(all.data, aes(x = FP_Areakm2, y = Sediment)) + 
   geom_point() +
-  scale_x_continuous() +
+  scale_x_log10(labels = trans_format('log10',math_format(10^.x))) +
   scale_y_continuous() +
   xlab(bquote("Floodplain unit area," ~km^2)) +
-  ylab("Sediment IFI")
+  ylab("Sediment IFI") +
+  theme_bw()
 
 a4 <- ggplot(all.data, aes(x = FP_Areakm2, y = Organics_S)) + 
   geom_point() +
-  scale_x_continuous() +
+  scale_x_log10(labels = trans_format('log10',math_format(10^.x))) +
   scale_y_continuous() +
   xlab(bquote("Floodplain unit area," ~km^2)) +
-  ylab("Organics and Solutes IFI")
+  ylab("Organics and Solutes IFI") +
+  theme_bw()
 
 a5 <- ggplot(all.data, aes(x = FP_Areakm2, y = Habitat)) + 
   geom_point() +
-  scale_x_continuous() +
+  scale_x_log10(labels = trans_format('log10',math_format(10^.x))) +
   scale_y_continuous() +
   xlab(bquote("Floodplain unit area," ~km^2)) +
-  ylab("Habitat IFI")
+  ylab("Habitat IFI") +
+  theme_bw()
 
 grid.arrange(a1, a2, a5, a4, a3, nrow = 2)
 
@@ -430,6 +436,19 @@ wetlands.plot <- ggplot(wetlands.comp, aes(x = Area_Density, y = Overall)) +
   labs(tag = "b)")
 wetlands.plot
 
+# Scatter plot of wetlands vs IFI by stream order
+wetlands.plot.SO <- ggplot(na.omit(wetlands.comp), aes(x = Area_Density, y = Overall)) + 
+  geom_point() +
+  xlim(0,1) + ylim(0,1) +
+  coord_equal() +
+  xlab("Density of Wetlands") +
+  ylab("Overall Index of Floodplain Integrity") +
+  facet_wrap(~StrmOrder) +
+  # geom_text(x= 0.9, y=0.1, label = paste0("R^2 = ", round(R2.wetlands,2))) +
+  theme_bw() +
+  theme(text = element_text(size=14))
+wetlands.plot.SO
+
 grid.arrange(ICI.intersect.plot, wetlands.plot, ncol = 2)
 
 ################################
@@ -455,16 +474,17 @@ func.plot <- ggplot(func.sensitivity, aes(min.func.name)) +
   geom_bar() +
   xlab("Function with Minimum IFI") +
   ylab("Number of Floodplain Units") +
-  theme(text = element_text(size=20)) +
-  theme_bw()
+  theme_bw() +
+  theme(text = element_text(size=14))
 func.plot
 
 sd.hist <- ggplot(func.sensitivity, aes(x = std.dev)) +
   geom_histogram(binwidth = 0.02) +
   xlab("Standard deviation of Function IFI") +
-  ylab("Number of Floodplain Units") +
-  theme(text = element_text(size=20)) +
-  theme_bw()
+  ylab("Number of Floodplain Units") + 
+  theme_bw() +
+  theme(text = element_text(size=14)) 
+  
 sd.hist
 
 # Investigate by stream order
@@ -476,7 +496,7 @@ sd.SO <- ggplot(func.sensitivity, aes(StrmOrder, std.dev, group = StrmOrder)) +
   scale_x_discrete(name = "Stream Order", breaks = seq(1:8)) + 
   ylab("Standard Deviation of Function IFI\n") +
   theme_linedraw() +
-  theme(text = element_text(size=20), panel.grid.major.x = element_blank(), panel.grid.major.y = element_blank(),
+  theme(text = element_text(size=14), panel.grid.major.x = element_blank(), panel.grid.major.y = element_blank(),
         panel.grid.minor.y = element_blank()) +
   geom_text(data = count.data, aes(StrmOrder, y = max(func.sensitivity$std.dev), label = Freq), 
             nudge_y = 0.05, size = 5)
@@ -502,18 +522,18 @@ min.func.SO <- func.sensitivity %>%
 min.func.plot <- ggplot(min.func.SO, aes(x= StrmOrder, y = percent, fill = min.func.name)) +
   geom_col(position = "fill") +
   scale_y_continuous(labels = percent) +
-  scale_fill_brewer(palette = "Set1") +
+  scale_fill_manual(values = wes_palette(n=5, name = "Darjeeling1")) +
   xlab("Stream Order") +
-  theme(text = element_text(size=16)) +
+  theme(text = element_text(size=14)) +
   labs(fill = "Minimum Function")
 min.func.plot
 
 min.func.plot2 <- ggplot(min.func.SO, aes(x= StrmOrder, y = n, fill = min.func.name)) +
   geom_col() +
   scale_y_continuous(name = "Count of Floodplain Units") +
-  scale_fill_brewer(palette = "Set1") +
+  scale_fill_manual(values = wes_palette(n=5, name = "Darjeeling1")) +
   xlab("Stream Order") +
-  theme(text = element_text(size=16)) +
+  theme(text = element_text(size=14)) +
   labs(fill = "Minimum Function")
 min.func.plot2
 
