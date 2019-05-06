@@ -130,7 +130,6 @@ area.barplot <- ggplot(data = na.omit(area.df), aes(x = breaks, y = value)) +
   geom_bar(stat = "identity", width = 1,  position = position_nudge(x = -0.5), fill = "grey27") +
   scale_x_continuous(limits = c(0, 20), breaks = seq(0, 20, 4), 
                      labels = c("0", "0.2", "0.4", "0.6", "0.8", "1.0")) +
-                     # labels = c("0", "0.1", "0.2", "0.3", "0.4", "0.5", "0.6", "0.7","0.8", "0.9", "1.0")) +
   facet_wrap(~ variable, ncol = 3) +
   labs(x = "IFI Value", y = bquote("Total floodplain area, " ~km^2)) +
   theme_bw(base_size = 16) +
@@ -369,8 +368,6 @@ R2.ICI.intersect <- summary(ICI.intersect.lm)$r.squared
 # Scatter plot of ICI vs IFI
 ICI.plot <- ggplot(ICI.comp, aes(x = ICI, y = Overall)) + geom_point() +
   xlim(0,1) + ylim(0,1) +
-  # scale_x_continuous(breaks = seq(0,1,0.25), labels = seq(0,1,0.25)) +
-  # scale_y_continuous(breaks = seq(0,1,0.25), labels = seq(0,1,0.25)) +
   coord_equal() +
   xlab("Index of Catchment Integrity") +
   ylab("Overall Index of Floodplain Integrity") +
@@ -382,12 +379,9 @@ ICI.plot <- ggplot(ICI.comp, aes(x = ICI, y = Overall)) + geom_point() +
 ICI.intersect.plot <- ggplot(ICI.intersect.comp, aes(x = ICI, y = Overall)) + 
   geom_point(size = 1) +
   xlim(0,1) + ylim(0,1) +
-  # scale_x_continuous(breaks = seq(0,1,0.25), labels = seq(0,1,0.25)) +
-  # scale_y_continuous(breaks = seq(0,1,0.25), labels = seq(0,1,0.25)) +
   coord_equal() +
   xlab("Index of Catchment Integrity") +
   ylab("Overall Index of Floodplain Integrity") +
-  # ggtitle("Catchments Intersected with Floodplain") +
   # geom_text(x= 0.1, y=0.1, label = paste0("R^2 = ", round(R2.ICI.intersect,2))) +
   theme_bw() +
   theme(text = element_text(size=16)) +
@@ -427,9 +421,6 @@ R2.wetlands.order <- lapply(wetlands.lm.order, function(x) summary(x)$r.squared)
 wetlands.plot <- ggplot(wetlands.comp, aes(x = Area_Density, y = Overall)) + 
   geom_point(size = 1) +
   xlim(0,1) + ylim(0,1) +
-  # facet_wrap(~ StrmOrder, ncol = 3) +
-  # scale_x_continuous(breaks = seq(0,1,0.25), labels = seq(0,1,0.25)) +
-  # scale_y_continuous(breaks = seq(0,1,0.25), labels = seq(0,1,0.25)) +
   coord_equal() +
   xlab("Density of Wetlands") +
   ylab("Overall Index of Floodplain Integrity") +

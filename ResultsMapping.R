@@ -141,7 +141,6 @@ levels(fp.df$variable) = c("Flood Reduction", "Groundwater Storage", "Sediment R
 
 map7 <- ggplot(data = fp.df, aes(x = long, y = lat, group = group, fill = value)) + 
   # geom_polygon(data = CO.boundary_tidy, aes(x = long, y = lat, group = group), fill = "grey93") +
-  # ggmap(get_map(location = bbox(CO.boundary), source = "osm", maptype = "toner", color = "bw", zoom = 1)) +
   geom_polygon() +
   # coord_equal() +
   coord_fixed(ratio = 1, xlim = xlimits, ylim = ylimits) +
