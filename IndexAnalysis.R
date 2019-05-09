@@ -185,6 +185,8 @@ grid.arrange(a1, a2, a5, a4, a3, nrow = 2)
 # Linear relationship between IFI as function of Area
 area.lm <- lm(all.data$IFI_geomean ~ log10(all.data$FP_Areakm2))
 R2 <- summary(area.lm)$r.squared
+summary(area.lm)
+cor.test(all.data$FP_Areakm2, all.data$IFI_geomean, method = c("pearson"))
 
 a6 <- ggplot(all.data, aes(x = FP_Areakm2, y = IFI_geomean)) + 
   geom_point() +
@@ -210,14 +212,15 @@ SO_comparisons <- list( c("1","2"), c("2","3"), c("3", "4"), c("4","5"), c("5","
 SO <- ggplot(na.omit(all.data), aes(StrmOrder, IFI_geomean, group = StrmOrder)) +
   geom_boxplot(na.rm = TRUE) +
   scale_x_discrete(name = "Stream Order", breaks = seq(1:8)) + 
+  scale_y_continuous(limits = c(0,1.5)) +
   ylab("Overall IFI") +
   theme_linedraw() +
   theme(text = element_text(size=16), panel.grid.major.x = element_blank(), panel.grid.major.y = element_blank(),
         panel.grid.minor.y = element_blank()) +
-  geom_text(data = count.data, aes(StrmOrder, y = 1.0, label = Freq), nudge_y = 0.05, size = 4) +
+  geom_text(data = count.data, aes(StrmOrder, y = 1.05, label = Freq), nudge_y = 0.05, size = 4) +
   labs(tag = "c)") +
   stat_compare_means(comparisons = SO_comparisons, label = "p.signif", method = "t.test", 
-                     label.y = seq(1.2, 1.4, 0.2/length(my_comparisons)))
+                     label.y = seq(1.25, 1.45, 0.2/length(SO_comparisons)))
   
 SO
 
@@ -262,7 +265,7 @@ ECO <- ggplot(all.data, aes(ECO_name, IFI_geomean)) +
   ylab("Overall IFI\n") +
   theme(text = element_text(size=20), panel.grid.major.x = element_blank(),
         legend.position = "none") +
-  geom_text(data = count.data.ECO, aes(ECO_name, y = 1.0, label = Freq), nudge_y = 0.05, size = 5)
+  geom_text(data = count.data.ECO, aes(ECO_name, y = 1.05, label = Freq), nudge_y = 0.05, size = 5)
 ECO
 
 #############################
@@ -279,16 +282,24 @@ count.data.city$Freq <- paste(" N =", as.character(count.data.city$Freq), sep = 
 t.test(IFI_geomean ~ In_City, data = all.data)
 # result: means are not equal
 
+city_comparisons <- list(c("0", "1"))
+
 City.plot <- ggplot(all.data, aes(In_City, IFI_geomean)) +
   geom_boxplot(aes(In_City, IFI_geomean)) +
   scale_x_discrete(name = "", labels = c("Rural", "Urban")) + 
+  scale_y_continuous(limits = c(0,1.5)) +
   ylab("Overall IFI") +
   theme_linedraw() +
   theme(text = element_text(size=16), panel.grid.major.x = element_blank(), panel.grid.major.y = element_blank(),
         panel.grid.minor.y = element_blank(), legend.position = "none") +
-  geom_text(data = count.data.city, aes(In_City, y = 1.0, label = Freq), nudge_y = 0.05, size = 4) +
-  labs(tag = "b)")
+  geom_text(data = count.data.city, aes(In_City, y = 1.05, label = Freq), nudge_y = 0.05, size = 4) +
+  labs(tag = "b)") +
+  stat_compare_means(comparisons = city_comparisons, label = "p.signif", 
+                    label.y = c(1.25))
 City.plot
+
+# Summary statistics, urban vs rural
+all.data %>% group_by(In_City) %>% summarize(mean = mean(IFI_geomean), med = median(IFI_geomean))
 
 ##############################
 # IFI by Physiographic region
@@ -318,14 +329,15 @@ Phys_comparisons <- list(c("Intermontane Plateaus", "Rocky Mountain System"),
 PHYS <- ggplot(all.data, aes(PhysioReg, IFI_geomean)) +
   geom_boxplot(aes(PhysioReg, IFI_geomean)) +
   scale_x_discrete(name = NULL, labels = function(x) str_wrap(x, width = 20)) + 
+  scale_y_continuous(limits = c(0,1.5)) +
   ylab("Overall IFI") +
   theme_linedraw() +
   theme(text = element_text(size=16), panel.grid.major.x = element_blank(), panel.grid.major.y = element_blank(),
         panel.grid.minor.y = element_blank(), legend.position = "none") +
-  geom_text(data = count.data.phys, aes(PhysioReg, y = 1.0, label = Freq), nudge_y = 0.05, size = 4) +
+  geom_text(data = count.data.phys, aes(PhysioReg, y = 1.05, label = Freq), nudge_y = 0.05, size = 4) +
   labs(tag = "a)") +
   stat_compare_means(comparisons = Phys_comparisons, label = "p.signif", 
-                     label.y = c(1.2, 1.3, 1.4))
+                     label.y = c(1.25, 1.35, 1.45))
 PHYS
 
 # Stream Order by physiographic region
@@ -337,6 +349,9 @@ phys.so <- ggplot(na.omit(all.data), aes(StrmOrder)) +
   theme_bw() +
   theme(text = element_text(size = 16))
 phys.so 
+
+# Summary statistics, physioregion
+all.data %>% group_by(PhysioReg) %>% summarize(mean = mean(IFI_geomean), med = median(IFI_geomean))
 
 ##############################
 # Combine boxplots to make figure
@@ -370,6 +385,9 @@ R2.ICI <- summary(ICI.lm)$r.squared
 
 ICI.intersect.lm <- lm(data = ICI.intersect.comp, Overall ~ ICI)
 R2.ICI.intersect <- summary(ICI.intersect.lm)$r.squared
+cor.test(ICI.intersect.comp$ICI, ICI.intersect.comp$Overall, method = c("pearson"))
+
+summary(ICI.intersect.lm)
 
 # Scatter plot of ICI vs IFI
 ICI.plot <- ggplot(ICI.comp, aes(x = ICI, y = Overall)) + geom_point() +
@@ -415,6 +433,8 @@ wetlands.comp <- merge(wetlands, IFI, by = "HUC12")
 # fit linear model
 wetlands.lm <- lm(data = wetlands.comp, Overall ~ Area_Density)
 R2.wetlands <- summary(wetlands.lm)$r.squared
+summary(wetlands.lm)
+cor.test(wetlands.comp$Area_Density, wetlands.comp$Overall, method = c("pearson"))
 
 # lm by stream order
 
