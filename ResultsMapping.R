@@ -49,7 +49,7 @@ CO.rivers_tidy <- tidy(CO.rivers, region = 'id')
 # Plot results
 
 # choose bounding box area for zoomed in area
-zoomsize <- 46000
+zoomsize <- 50000
 xlimits <- c(494000,494000 + zoomsize)
 ylimits <- c(4506000, 4506000 - zoomsize)
 
@@ -147,8 +147,8 @@ map7 <- ggplot(data = fp.df, aes(x = long, y = lat, group = group, fill = value)
   facet_wrap(~ variable, ncol = 3) +
   scale_fill_gradientn(colours = c("chocolate3", "wheat1" ,"darkcyan"), breaks = seq(0, 1, by = 0.2)) +
   labs(x = NULL, y = NULL, fill = "IFI") +
-  theme_minimal(base_size = 16) + 
-  theme(panel.background = element_rect(fill = "grey93"),
+  theme_minimal(base_size = 18) + 
+  theme(panel.background = element_rect(fill = "grey90"),
         panel.border = element_rect(fill = NA, colour = "black"),
         legend.position = "bottom",
         legend.text = element_text(size = 12),
