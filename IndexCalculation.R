@@ -197,6 +197,7 @@ for (i in 1:ncol(stressors)) {
 boxplot(stressors.scaled, use.cols = TRUE, ylab = 'Scaled Stressor Density')
 
 
+
 # Compute  Index as average of stressors scaled for each function
 Function.Index.Scaled <- data.frame(matrix(NA, nrow = nrow(stressors.scaled), ncol = length(data.byfunction)))
 
@@ -244,6 +245,10 @@ IFI.scaled.plot
 
 # Export to csv
 HUC12 <- all.data$HUC12
+
+scaled.stressors <- data.frame(HUC12, stressors.scaled)
+Stressors.outfile <- paste(out.path, "Scaled_Stressors.csv", sep="")
+write.csv(scaled.stressors, file = Stressors.outfile)
 
 combined.data <- data.frame(HUC12,Function.Index.Scaled,IFI.comb.scaled)
 IFI.outfile <- paste(out.path, "IFI_Scaled.csv", sep="")
