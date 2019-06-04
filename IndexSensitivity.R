@@ -141,12 +141,3 @@ method.contrasts
 
 
 
-
-
-# Export to csv
-HUC12 <- all.data$HUC12
-
-# combined.data <- data.frame(HUC12,Function.Index.Scaled,IFI.comb.scaled)
-# IFI.outfile <- paste(out.path, "IFI_Scaled_.csv", sep="")
-# write.csv(combined.data, file = IFI.outfile)
-
