@@ -17,6 +17,7 @@ library(broom)
 library(gridExtra)
 library(reshape2)
 library(ggmap)
+library(ggpubr)
 
 # Set working directory
 setwd("C:/Users/mnk5/Documents/floodplain_integrity")
@@ -24,7 +25,7 @@ setwd("C:/Users/mnk5/Documents/floodplain_integrity")
 # read in files
 floodplain <- readOGR(dsn = "RawData/SpatialData", layer = "CO_FP_IFI")
 CO.boundary <- readOGR(dsn = "RawData/SpatialData", layer = "CO_StateBoundary_UTM")
-CO.HUC12 <- readOGR(dsn = "RawData/SpatialData", layer = "CO_HUC12_IFI")
+CO.HUC12 <- readOGR(dsn = "RawData/SpatialData", layer = "CO_HUC12_IFI_clip")
 # NHD v1 segments order 4 and larger in Colorado
 CO.rivers <- readOGR(dsn = "RawData/SpatialData", layer = "NHDv1_Order4_CO")
 
@@ -72,37 +73,42 @@ map
 # Overall IFI
 
 map1 <- ggplot(data = floodplain.df, aes(x = long, y = lat, group = group, fill = IFI_geomea)) + 
-  geom_polygon(data = CO.boundary_tidy, aes(x = long, y = lat, group = group), fill = "grey93") +
+  geom_polygon(data = CO.boundary_tidy, aes(x = long, y = lat, group = group), color = "black", 
+               size = 1, fill = "grey90") +
   geom_polygon(data = floodplain.df, aes(x = long, y = lat, group = group, fill = IFI_geomea)) +
   coord_equal() +
   # coord_fixed(ratio = 1, xlim = xlimits, ylim = ylimits) +
-  scale_fill_gradientn(colours = c("chocolate3", "wheat1" ,"darkcyan"), breaks = seq(0, 1, by = 0.2))
-map1 <- map1 + labs(x = NULL, y = NULL, fill = "IFI")
-map1 <- map1 + theme_minimal(base_size = 14) + 
-  theme(legend.text = element_text(size = 14)) +
+  scale_fill_gradientn(colours = c("chocolate3", "wheat1" ,"darkcyan"), breaks = seq(0, 1.0, by = 0.2), 
+                       labels = c("0.0","0.2", "0.4", "0.6", "0.8", "1.0"), limits = c(0,1)) +  labs(x = NULL, y = NULL, fill = "IFI") +
+  theme_minimal(base_size = 14) + 
+  theme(legend.text = element_text(size = 12), legend.key.width = unit(1, "cm")) +
   theme(axis.text=element_blank()) +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  labs(tag = "a)")
 
 map1
 
 # Overall IFI mapped to HUC-12 units
 
 map2 <- ggplot(data = HUC12.df, aes(x = long, y = lat, group = group)) + 
-  geom_polygon(data = HUC12.df, color = "grey27", size = 0.1, aes(x = long, y = lat, group = group, fill = IFI_geomea)) +
+  geom_polygon(data = HUC12.df, color = "grey27", size = 0.01, aes(x = long, y = lat, group = group, fill = IFI_geomea)) +
   geom_polygon(data = CO.boundary_tidy, aes(x = long, y = lat, group = group), 
-               fill = NA, color = "black", size = 1.5) +
-  geom_path(data = CO.rivers_tidy, aes(x = long, y = lat, group = group), color = "navy", size = 1) +
+               fill = NA, color = "black", size = 1) +
+  geom_path(data = CO.rivers_tidy, aes(x = long, y = lat, group = group), color = "dodgerblue1", size = 0.5) +
   coord_equal() +
   # coord_fixed(ratio = 1, xlim = xlimits, ylim = ylimits) +
   scale_fill_gradientn(colours = c("chocolate3", "wheat1" ,"darkcyan"), breaks = seq(0, 1.0, by = 0.2), 
                        labels = c("0.0","0.2", "0.4", "0.6", "0.8", "1.0"), limits = c(0,1)) +
   labs(x = NULL, y = NULL, fill = "IFI") +
-  theme_minimal(base_size = 12) + 
-  theme(legend.text = element_text(size = 12)) +
+  theme_minimal(base_size = 14) + 
+  theme(legend.text = element_text(size = 12), legend.key.width = unit(1, "cm")) +
   theme(axis.text=element_blank()) +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  labs(tag = "b)")
 
 map2
+
+ggarrange(map1, map2, nrow = 1, ncol = 2, common.legend = TRUE, legend = "bottom")
 
 
 ###################################
