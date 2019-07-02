@@ -73,44 +73,50 @@ map
 # Overall IFI
 
 map1 <- ggplot(data = floodplain.df, aes(x = long, y = lat, group = group, fill = IFI_geomea)) + 
-  geom_polygon(data = CO.boundary_tidy, aes(x = long, y = lat, group = group), color = "black", 
-               size = 1, fill = "grey90") +
+  geom_polygon(data = CO.boundary_tidy, aes(x = long, y = lat, group = group), fill = "grey90") +
   geom_polygon(data = floodplain.df, aes(x = long, y = lat, group = group, fill = IFI_geomea)) +
+  geom_polygon(data = CO.boundary_tidy, aes(x = long, y = lat, group = group), 
+               fill = NA, color = "black", size = 0.5) +
   coord_equal() +
   # coord_fixed(ratio = 1, xlim = xlimits, ylim = ylimits) +
   scale_fill_gradientn(colours = c("chocolate3", "wheat1" ,"darkcyan"), breaks = seq(0, 1.0, by = 0.2), 
                        labels = c("0.0","0.2", "0.4", "0.6", "0.8", "1.0"), limits = c(0,1)) +  labs(x = NULL, y = NULL, fill = "IFI") +
-  theme_minimal(base_size = 14) + 
-  theme(legend.text = element_text(size = 12), legend.key.width = unit(1, "cm")) +
+  theme_minimal(base_size = 10) + 
+  theme(legend.text = element_text(size = 10), legend.key.width = unit(0.75, "cm")) +
   theme(axis.text=element_blank()) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   labs(tag = "a)")
-
-map1
 
 # Overall IFI mapped to HUC-12 units
 
 map2 <- ggplot(data = HUC12.df, aes(x = long, y = lat, group = group)) + 
   geom_polygon(data = HUC12.df, color = "grey27", size = 0.01, aes(x = long, y = lat, group = group, fill = IFI_geomea)) +
+  geom_path(data = CO.rivers_tidy, aes(x = long, y = lat, group = group), color = "dodgerblue1", size = 0.2) +
   geom_polygon(data = CO.boundary_tidy, aes(x = long, y = lat, group = group), 
-               fill = NA, color = "black", size = 1) +
-  geom_path(data = CO.rivers_tidy, aes(x = long, y = lat, group = group), color = "dodgerblue1", size = 0.5) +
+               fill = NA, color = "black", size = 0.5) +
   coord_equal() +
   # coord_fixed(ratio = 1, xlim = xlimits, ylim = ylimits) +
   scale_fill_gradientn(colours = c("chocolate3", "wheat1" ,"darkcyan"), breaks = seq(0, 1.0, by = 0.2), 
                        labels = c("0.0","0.2", "0.4", "0.6", "0.8", "1.0"), limits = c(0,1)) +
   labs(x = NULL, y = NULL, fill = "IFI") +
-  theme_minimal(base_size = 14) + 
-  theme(legend.text = element_text(size = 12), legend.key.width = unit(1, "cm")) +
+  theme_minimal(base_size = 10) + 
+  theme(legend.text = element_text(size = 10), legend.key.width = unit(0.75, "cm")) +
   theme(axis.text=element_blank()) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   labs(tag = "b)")
 
-map2
-
-ggarrange(map1, map2, nrow = 1, ncol = 2, common.legend = TRUE, legend = "bottom")
 
 
+# tiff("CO_results.tif", units = "in", width = 6.5, height = 3, res = 300)
+
+Figure <- ggarrange(map1, map2, nrow = 1, ncol = 2, common.legend = TRUE, legend = "bottom")
+
+
+ggsave("CO_results.tiff", plot = Figure, 
+       path = "C:/Users/mnk5/Documents/floodplain_integrity/Outputs/",
+       width = 6.5, height = 3, units = "in", dpi = 1800)
+
+# dev.off()
 ###################################
 # Map minimum function to HUC-12
 
