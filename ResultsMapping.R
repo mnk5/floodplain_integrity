@@ -159,12 +159,16 @@ map7 <- ggplot(data = fp.df, aes(x = long, y = lat, group = group, fill = value)
   facet_wrap(~ variable, ncol = 3) +
   scale_fill_gradientn(colours = c("chocolate3", "wheat1" ,"darkcyan"), breaks = seq(0, 1, by = 0.2)) +
   labs(x = NULL, y = NULL, fill = "IFI") +
-  theme_minimal(base_size = 18) + 
+  theme_minimal(base_size = 12) + 
   theme(panel.background = element_rect(fill = "grey90"),
         panel.border = element_rect(fill = NA, colour = "black"),
         legend.position = "bottom",
-        legend.text = element_text(size = 12),
-        legend.key.width = unit(1, "cm"),
+        legend.text = element_text(size = 10),
+        legend.key.width = unit(0.75, "cm"),
         axis.text=element_blank(),
         panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 map7
+
+ggsave("Function_maps.tiff", plot = map7, 
+       path = "C:/Users/mnk5/Documents/floodplain_integrity/Outputs/",
+       width = 6.5, height = 5.7, units = "in", dpi = 300)

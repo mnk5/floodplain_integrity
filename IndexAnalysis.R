@@ -133,10 +133,13 @@ area.barplot <- ggplot(data = na.omit(area.df), aes(x = breaks, y = value)) +
                      labels = c("0", "0.2", "0.4", "0.6", "0.8", "1.0")) +
   facet_wrap(~ variable, ncol = 3) +
   labs(x = "IFI Value", y = bquote("Total floodplain area, " ~km^2)) +
-  theme_bw(base_size = 16) +
+  theme_bw(base_size = 12) +
   theme(strip.background =element_rect(fill="grey93"))
 area.barplot
 
+ggsave("Histograms.tiff", plot = area.barplot, 
+       path = "C:/Users/mnk5/Documents/floodplain_integrity/Outputs/",
+       width = 6.5, height = 4, units = "in", dpi = 300)
 
 #######################################
 # Plot by floodplain area
@@ -215,12 +218,12 @@ SO <- ggplot(na.omit(all.data), aes(StrmOrder, IFI_geomean, group = StrmOrder)) 
   scale_y_continuous(limits = c(0,1.5)) +
   ylab("Overall IFI") +
   theme_linedraw() +
-  theme(text = element_text(size=16), panel.grid.major.x = element_blank(), panel.grid.major.y = element_blank(),
+  theme(text = element_text(size=12), panel.grid.major.x = element_blank(), panel.grid.major.y = element_blank(),
         panel.grid.minor.y = element_blank()) +
-  geom_text(data = count.data, aes(StrmOrder, y = 1.05, label = Freq), nudge_y = 0.05, size = 4) +
+  geom_text(data = count.data, aes(StrmOrder, y = 1.05, label = Freq), nudge_y = 0.05, size = 3) +
   labs(tag = "c)") +
   stat_compare_means(comparisons = SO_comparisons, label = "p.signif", method = "t.test", 
-                     label.y = seq(1.25, 1.45, 0.2/length(SO_comparisons)))
+                     label.y = seq(1.25, 1.45, 0.2/length(SO_comparisons)), size = 3)
   
 SO
 
@@ -290,12 +293,12 @@ City.plot <- ggplot(all.data, aes(In_City, IFI_geomean)) +
   scale_y_continuous(limits = c(0,1.5)) +
   ylab("Overall IFI") +
   theme_linedraw() +
-  theme(text = element_text(size=16), panel.grid.major.x = element_blank(), panel.grid.major.y = element_blank(),
+  theme(text = element_text(size=12), panel.grid.major.x = element_blank(), panel.grid.major.y = element_blank(),
         panel.grid.minor.y = element_blank(), legend.position = "none") +
-  geom_text(data = count.data.city, aes(In_City, y = 1.05, label = Freq), nudge_y = 0.05, size = 4) +
+  geom_text(data = count.data.city, aes(In_City, y = 1.05, label = Freq), nudge_y = 0.05, size = 3) +
   labs(tag = "b)") +
   stat_compare_means(comparisons = city_comparisons, label = "p.signif", 
-                    label.y = c(1.25))
+                    label.y = c(1.25), size =3)
 City.plot
 
 # Summary statistics, urban vs rural
@@ -332,12 +335,12 @@ PHYS <- ggplot(all.data, aes(PhysioReg, IFI_geomean)) +
   scale_y_continuous(limits = c(0,1.5)) +
   ylab("Overall IFI") +
   theme_linedraw() +
-  theme(text = element_text(size=16), panel.grid.major.x = element_blank(), panel.grid.major.y = element_blank(),
+  theme(text = element_text(size=12), panel.grid.major.x = element_blank(), panel.grid.major.y = element_blank(),
         panel.grid.minor.y = element_blank(), legend.position = "none") +
-  geom_text(data = count.data.phys, aes(PhysioReg, y = 1.05, label = Freq), nudge_y = 0.05, size = 4) +
+  geom_text(data = count.data.phys, aes(PhysioReg, y = 1.05, label = Freq), nudge_y = 0.05, size = 3) +
   labs(tag = "a)") +
   stat_compare_means(comparisons = Phys_comparisons, label = "p.signif", 
-                     label.y = c(1.25, 1.35, 1.45))
+                     label.y = c(1.25, 1.32, 1.45), size = 3)
 PHYS
 
 # Stream Order by physiographic region
@@ -359,6 +362,10 @@ all.data %>% group_by(PhysioReg) %>% summarize(mean = mean(IFI_geomean), med = m
 # divide grid arrange by 5
 Figure <- grid.arrange(PHYS, City.plot, SO,
                        layout_matrix = rbind(c(1,1,1,2,2), c(3,3,3,3,3)))
+
+ggsave("Boxplots.tiff", plot = Figure, 
+       path = "C:/Users/mnk5/Documents/floodplain_integrity/Outputs/",
+       width = 6.5, height = 4.95, units = "in", dpi = 300)
 
 ##############################
 # IFI vs ICI comparison
