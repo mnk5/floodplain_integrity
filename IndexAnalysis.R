@@ -213,7 +213,7 @@ count.data$Freq <- paste(" N =", as.character(count.data$Freq), sep = " ")
 SO_comparisons <- list( c("1","2"), c("2","3"), c("3", "4"), c("4","5"), c("5","6"), c("6", "7"))
 
 SO <- ggplot(na.omit(all.data), aes(StrmOrder, IFI_geomean, group = StrmOrder)) +
-  geom_boxplot(na.rm = TRUE) +
+  geom_boxplot(na.rm = TRUE, lwd = 0.4, outlier.size = 0.7) +
   scale_x_discrete(name = "Stream Order", breaks = seq(1:8)) + 
   scale_y_continuous(limits = c(0,1.5)) +
   ylab("Overall IFI") +
@@ -288,7 +288,7 @@ t.test(IFI_geomean ~ In_City, data = all.data)
 city_comparisons <- list(c("0", "1"))
 
 City.plot <- ggplot(all.data, aes(In_City, IFI_geomean)) +
-  geom_boxplot(aes(In_City, IFI_geomean)) +
+  geom_boxplot(aes(In_City, IFI_geomean), lwd = 0.4, outlier.size = 0.7) +
   scale_x_discrete(name = "", labels = c("Rural", "Urban")) + 
   scale_y_continuous(limits = c(0,1.5)) +
   ylab("Overall IFI") +
@@ -330,7 +330,7 @@ Phys_comparisons <- list(c("Intermontane Plateaus", "Rocky Mountain System"),
 
 #Plot boxplots
 PHYS <- ggplot(all.data, aes(PhysioReg, IFI_geomean)) +
-  geom_boxplot(aes(PhysioReg, IFI_geomean)) +
+  geom_boxplot(aes(PhysioReg, IFI_geomean), lwd = 0.4, outlier.size = 0.7) +
   scale_x_discrete(name = NULL, labels = function(x) str_wrap(x, width = 20)) + 
   scale_y_continuous(limits = c(0,1.5)) +
   ylab("Overall IFI") +
@@ -408,17 +408,19 @@ ICI.plot <- ggplot(ICI.comp, aes(x = ICI, y = Overall)) + geom_point() +
 
 # Scatter plot for catchments intersected with floodplains, ICI vs IFI
 ICI.intersect.plot <- ggplot(ICI.intersect.comp, aes(x = ICI, y = Overall)) + 
-  geom_point(size = 1) +
+  geom_point(size = 0.5) +
   xlim(0,1) + ylim(0,1) +
   coord_equal() +
   xlab("Index of Catchment Integrity") +
   ylab("Overall Index of Floodplain Integrity") +
   # geom_text(x= 0.1, y=0.1, label = paste0("R^2 = ", round(R2.ICI.intersect,2))) +
   theme_bw() +
-  theme(text = element_text(size=16)) +
+  theme(text = element_text(size=10)) +
   labs(tag = "a)")
 
 grid.arrange(ICI.plot, ICI.intersect.plot, ncol = 2)
+
+
 
 
 # Look at distribution of ICI values (very few over 0.8)
@@ -452,14 +454,14 @@ R2.wetlands.order <- lapply(wetlands.lm.order, function(x) summary(x)$r.squared)
 
 # Scatter plot of wetlands vs IFI
 wetlands.plot <- ggplot(wetlands.comp, aes(x = Area_Density, y = Overall)) + 
-  geom_point(size = 1) +
+  geom_point(size = 0.5) +
   xlim(0,1) + ylim(0,1) +
   coord_equal() +
   xlab("Density of Wetlands") +
   ylab("Overall Index of Floodplain Integrity") +
   # geom_text(x= 0.9, y=0.1, label = paste0("R^2 = ", round(R2.wetlands,2))) +
   theme_bw() +
-  theme(text = element_text(size=16)) +
+  theme(text = element_text(size=10)) +
   labs(tag = "b)")
 wetlands.plot
 
@@ -473,10 +475,14 @@ wetlands.plot.SO <- ggplot(na.omit(wetlands.comp), aes(x = Area_Density, y = Ove
   facet_wrap(~StrmOrder) +
   # geom_text(x= 0.9, y=0.1, label = paste0("R^2 = ", round(R2.wetlands,2))) +
   theme_bw() +
-  theme(text = element_text(size=14))
+  theme(text = element_text(size=10))
 wetlands.plot.SO
 
-grid.arrange(ICI.intersect.plot, wetlands.plot, ncol = 2)
+Comp.graph <- grid.arrange(ICI.intersect.plot, wetlands.plot, ncol = 2)
+
+ggsave("IFI_validation.tiff", plot = Comp.graph, 
+       path = "C:/Users/mnk5/Documents/floodplain_integrity/Outputs/",
+       width = 6.5, height = 3.15, units = "in", dpi = 300)
 
 ################################
 # Sensitivity analysis of Function IFI results
@@ -578,14 +584,19 @@ levels(ratio.df$Var2) = c("Flood Reduction", "Groundwater Storage", "Sediment Re
                              "Organics/Solutes Regulation", "Habitat Provision")
 
 ratio.plot <- ggplot(ratio.df, aes(x = Var2, y = value)) +
-  geom_boxplot() +
-  geom_hline(yintercept = 1, linetype = "dashed", size = 1) +
+  geom_boxplot(lwd = 0.4, outlier.size = 0.7) +
+  geom_hline(yintercept = 1, linetype = "dashed", size = 0.5) +
   scale_x_discrete(labels = function(x) str_wrap(x, width = 10)) +
   labs( y = "Ratio of Function to Overall IFI\n", x = NULL) +
   theme_linedraw() +
-  theme(text = element_text(size=16), panel.grid.major.x = element_blank(), panel.grid.major.y = element_blank(),
+  theme(text = element_text(size=12), panel.grid.major.x = element_blank(), panel.grid.major.y = element_blank(),
         panel.grid.minor.y = element_blank(), legend.position = "none")
 ratio.plot
+
+
+ggsave("Ratio_plot.tiff", plot = ratio.plot, 
+       path = "C:/Users/mnk5/Documents/floodplain_integrity/Outputs/",
+       width = 6.5, height = 4.35, units = "in", dpi = 300)
 
 # Test for significant differences 
 
