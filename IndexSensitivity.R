@@ -65,7 +65,7 @@ for (i in 1:length(data.byfunction)) {
 
 # 
 # plot(stressors$Agriculture, IFI.neg$Habitat)
-plot(stressors$MH20, IFI.pos$Habitat)
+# plot(stressors$MH20, IFI.pos$Habitat)
 # plot(stressors$MH20, IFI.linear$Habitat)
 
 # plot boxplots of index by function
@@ -94,6 +94,11 @@ neg.plot <- ggplot(stack(IFI.neg), aes(x = ind, y = values)) +
 
 grid.arrange(linear.plot, pos.plot, neg.plot)
 
+#meake function lines for plotting
+line.df <- data.frame(x = seq(0, 1, 0.01))
+line.df$linear <- 1 - line.df$x
+line.df$pos <- (line.df$x - 1)^2
+line.df$neg <- (-line.df$x^2 +1)
 
 
 # Compute overall Index of floodplain Integrity
@@ -105,18 +110,38 @@ IFI.Overall <- data.frame("Linear"  = IFI.linear$Overall,
                           "Positive Quadratic" = IFI.pos$Overall,
                           "Negative Quadratic" = IFI.neg$Overall)
 
+func.plot <- ggplot(line.df, aes(x, linear)) +
+  geom_line(lwd = 0.4) +
+  geom_line(aes(x, pos), linetype = "22", lwd = 0.4) +
+  geom_line(aes(x, neg), linetype = "longdash", lwd = 0.4) +
+  theme_linedraw() +
+  labs(tag = "a)") +
+  coord_equal() +
+  xlab("Stessor Density") +
+  ylab("Index of Floodplain Integrity") +
+  theme(text = element_text(size=8), panel.grid.major.x = element_blank(), panel.grid.major.y = element_blank(),
+        panel.grid.minor.y = element_blank(), panel.grid.minor.x = element_blank()) 
+func.plot
 
 
 IFI.plot <- ggplot(na.omit(stack(IFI.Overall)), aes(x = ind, y = values, group = ind)) + 
   scale_y_continuous(limits = c(0,1)) +
-  geom_boxplot() +
+  scale_x_discrete(labels = c("Linear","Positive Quadratic","Negative Quadratic")) +
+  geom_boxplot(aes(linetype = ind), lwd = 0.4, outlier.size = 0.7) +
   xlab("") +
   ylab("Index of Floodplain Integrity") +
+  labs(tag = "b)") +
   theme_linedraw() +
-  theme(text = element_text(size=16), panel.grid.major.x = element_blank(), panel.grid.major.y = element_blank(),
+  theme(text = element_text(size=8), axis.text.x = element_text(size = 8), 
+        panel.grid.major.x = element_blank(), panel.grid.major.y = element_blank(),
         panel.grid.minor.y = element_blank(), legend.position = "none") 
 
 IFI.plot
+Figure <- grid.arrange(func.plot, IFI.plot, nrow = 1, widths = 1:2)
+
+ggsave("Sensitivity.tiff", plot = Figure, 
+       path = "C:/Users/mnk5/Documents/floodplain_integrity/Outputs/",
+       width = 6.5, height = 2.1, units = "in", dpi = 300)
 
 IFI.hist <- ggplot(na.omit(stack(IFI.Overall)), aes(x = values, group = ind)) + 
   scale_y_continuous() +
@@ -129,6 +154,7 @@ IFI.hist <- ggplot(na.omit(stack(IFI.Overall)), aes(x = values, group = ind)) +
         panel.grid.minor.y = element_blank(), legend.position = "none") 
 
 IFI.hist
+
 
 
 # Test for Significant difference
