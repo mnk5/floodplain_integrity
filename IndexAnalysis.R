@@ -607,3 +607,14 @@ ratio.pairwise <- lsmeans(ratio.lm, pairwise ~ Var2)
 method.contrasts <- ratio.pairwise$contrasts
 method.contrasts
 # results: all significantly different except sediment and organics
+
+
+##############################################
+# Find area of impaired wetlands
+#############################################
+
+limit <- 0.5
+
+Impaired.FP <- subset(all.data, IFI_geomean < 0.5)
+Impaired.area <- sum(Impaired.FP$FP_Areakm2)
+Impaired.fraction <- Impaired.area/ sum(all.data$FP_Areakm2)
