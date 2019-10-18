@@ -112,7 +112,7 @@ map2 <- ggplot(data = HUC12.df, aes(x = long, y = lat, group = group)) +
 Figure <- ggarrange(map1, map2, nrow = 1, ncol = 2, common.legend = TRUE, legend = "bottom")
 
 
-ggsave("CO_results.tiff", plot = Figure, 
+ggsave("Figure_5.pdf", plot = Figure, 
        path = "C:/Users/mnk5/Documents/floodplain_integrity/Outputs/",
        width = 6.5, height = 3, units = "in", dpi = 1800)
 
@@ -169,6 +169,6 @@ map7 <- ggplot(data = fp.df, aes(x = long, y = lat, group = group, fill = value)
         panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 map7
 
-ggsave("Function_maps.tiff", plot = map7, 
+ggsave("Figure_7.pdf", plot = map7, 
        path = "C:/Users/mnk5/Documents/floodplain_integrity/Outputs/",
-       width = 6.5, height = 5.7, units = "in", dpi = 300)
+       width = 6.5, height = 5.7, units = "in", dpi = 1000)

@@ -139,9 +139,9 @@ IFI.plot <- ggplot(na.omit(stack(IFI.Overall)), aes(x = ind, y = values, group =
 IFI.plot
 Figure <- grid.arrange(func.plot, IFI.plot, nrow = 1, widths = 1:2)
 
-ggsave("Sensitivity.tiff", plot = Figure, 
+ggsave("Figure_4.pdf", plot = Figure, 
        path = "C:/Users/mnk5/Documents/floodplain_integrity/Outputs/",
-       width = 6.5, height = 2.1, units = "in", dpi = 300)
+       width = 6.5, height = 2.1, units = "in", dpi = 1000)
 
 IFI.hist <- ggplot(na.omit(stack(IFI.Overall)), aes(x = values, group = ind)) + 
   scale_y_continuous() +

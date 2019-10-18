@@ -137,9 +137,9 @@ area.barplot <- ggplot(data = na.omit(area.df), aes(x = breaks, y = value)) +
   theme(strip.background =element_rect(fill="grey93"))
 area.barplot
 
-ggsave("Histograms.tiff", plot = area.barplot, 
+ggsave("Figure_6.pdf", plot = area.barplot, 
        path = "C:/Users/mnk5/Documents/floodplain_integrity/Outputs/",
-       width = 6.5, height = 4, units = "in", dpi = 300)
+       width = 6.5, height = 4, units = "in", dpi = 1000)
 
 #######################################
 # Plot by floodplain area
@@ -363,9 +363,9 @@ all.data %>% group_by(PhysioReg) %>% summarize(mean = mean(IFI_geomean), med = m
 Figure <- grid.arrange(PHYS, City.plot, SO,
                        layout_matrix = rbind(c(1,1,1,2,2), c(3,3,3,3,3)))
 
-ggsave("Boxplots.tiff", plot = Figure, 
+ggsave("Figure_8.pdf", plot = Figure, 
        path = "C:/Users/mnk5/Documents/floodplain_integrity/Outputs/",
-       width = 6.5, height = 4.95, units = "in", dpi = 300)
+       width = 6.5, height = 4.95, units = "in", dpi = 1000)
 
 ##############################
 # IFI vs ICI comparison
@@ -480,9 +480,9 @@ wetlands.plot.SO
 
 Comp.graph <- grid.arrange(ICI.intersect.plot, wetlands.plot, ncol = 2)
 
-ggsave("IFI_validation.tiff", plot = Comp.graph, 
+ggsave("Figure_10.pdf", plot = Comp.graph, 
        path = "C:/Users/mnk5/Documents/floodplain_integrity/Outputs/",
-       width = 6.5, height = 3.15, units = "in", dpi = 300)
+       width = 6.5, height = 3.15, units = "in", dpi = 1000)
 
 ################################
 # Sensitivity analysis of Function IFI results
@@ -594,9 +594,9 @@ ratio.plot <- ggplot(ratio.df, aes(x = Var2, y = value)) +
 ratio.plot
 
 
-ggsave("Ratio_plot.tiff", plot = ratio.plot, 
+ggsave("Figure_9.pdf", plot = ratio.plot, 
        path = "C:/Users/mnk5/Documents/floodplain_integrity/Outputs/",
-       width = 6.5, height = 4.35, units = "in", dpi = 300)
+       width = 6.5, height = 4.35, units = "in", dpi = 1000)
 
 # Test for significant differences 
 
